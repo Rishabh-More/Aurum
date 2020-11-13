@@ -5933,6 +5933,13 @@ react-native-linear-gradient@^2.5.6:
   resolved "https://registry.yarnpkg.com/react-native-linear-gradient/-/react-native-linear-gradient-2.5.6.tgz#96215cbc5ec7a01247a20890888aa75b834d44a0"
   integrity sha512-HDwEaXcQIuXXCV70O+bK1rizFong3wj+5Q/jSyifKFLg0VWF95xh8XQgfzXwtq0NggL9vNjPKXa016KuFu+VFg==
 
+react-native-otp-textinput@^0.0.7:
+  version "0.0.7"
+  resolved "https://registry.yarnpkg.com/react-native-otp-textinput/-/react-native-otp-textinput-0.0.7.tgz#c636d86e4472fb0dd4c9e798e7504d0a217114d2"
+  integrity sha512-4q3HVL8a5SCrLy7Fiyv/+4HvUmOSZYC+JvKaQQB1sObyb5v9EcsdtZrK0ffE+7g/u501aIKbDZfhr8flFeGKZw==
+  dependencies:
+    prop-types "^15.6.2"
+
 react-native-paper@^4.3.1:
   version "4.3.1"
   resolved "https://registry.yarnpkg.com/react-native-paper/-/react-native-paper-4.3.1.tgz#2c230a29b077fe0a89c2d192c22f91f300311b27"

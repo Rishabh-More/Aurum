@@ -53,14 +53,67 @@ export default function Login() {
   const [messagePWD, setPWDMessage] = useState("All Good");
 
   useEffect(() => {
-    DeviceInfo.getBuildId().then((buildId) => {
-      console.log("Build ID", buildId);
-    });
-    console.log("Device Id", DeviceInfo.getDeviceId());
-    console.log("Unique Id", DeviceInfo.getUniqueId());
+    // DeviceInfo.getBuildId().then((buildId) => {
+    //   console.log("Build ID", buildId);
+    // });
+    // console.log("Device Id", DeviceInfo.getDeviceId());
+    // console.log("Unique Id", DeviceInfo.getUniqueId());
+    Toast.show("Component Rerendered");
   }, []);
 
+  async function VerifyInputs() {
+    var pattern = /^[a-zA-Z0-9\-_]+(\.[a-zA-Z0-9\-_]+)*@[a-z0-9]+(\-[a-z0-9]+)*(\.[a-z0-9]+(\-[a-z0-9]+)*)*\.[a-z]{2,4}$/;
+    if (login.email == "") {
+      //Email cannot be empty
+      setEmailMessage("Email cannot be Blank!");
+      setEmailError(true);
+      return;
+    } else if (login.email != "" && !pattern.test(login.email)) {
+      //Email is not valid
+      setEmailMessage("This is not a valid email address!");
+      setEmailError(true);
+      return;
+    } else {
+      console.log("resolved email");
+      setEmailMessage("");
+      setEmailError(false);
+    }
+    if (login.password == "") {
+      //Password cannot be empty
+      setPWDMessage("Password cannot be Empty!");
+      setPWDError(true);
+      return;
+    } else if (login.password.length < 5) {
+      //Password must be minimum 5 characters.
+      setPWDMessage("Password must be of minimum 5 characters!");
+      setPWDError(true);
+      return;
+    } else {
+      console.log("resolved password");
+      setPWDMessage("");
+      setPWDError(false);
+    }
+    if (login.licenseKey == "") {
+      //License Key can't be Empty
+      setLicenseError(true);
+      return;
+    } else {
+      console.log("License resolved");
+      setLicenseError(false);
+    }
+    if (login.deviceName == "") {
+      //Device Name can't be empty as well
+      setDeviceError(true);
+      return;
+    } else {
+      console.log("Device name resolved");
+      setDeviceError(false);
+    }
+    Toast.show("Validation Successful");
+  }
+
   function MobileContent() {
+    console.log("mobile_content rerendered");
     return (
       <View style={{ flex: 1, backgroundColor: colors.accent }}>
         <View style={{ flex: 1, justifyContent: "center", alignItems: "center" }}></View>
@@ -88,6 +141,7 @@ export default function Login() {
   }
 
   function TabContent() {
+    console.log("tab_content rerendered");
     return (
       <View
         style={{
@@ -123,6 +177,7 @@ export default function Login() {
   }
 
   function Header() {
+    console.log("header_component rerendered");
     return (
       <View style={{ margin: "5%" }}>
         <Title>Welcome User</Title>
@@ -132,6 +187,7 @@ export default function Login() {
   }
 
   function Footer() {
+    console.log("footer_component rerendered");
     return (
       <View style={{ margin: isTablet ? "5%" : "3.5%" }}>
         <Button
@@ -145,12 +201,17 @@ export default function Login() {
             start: { x: 1, y: 1 },
             end: { x: 1, y: 0 },
           }}
+          onPress={() => {
+            //VerifyInputs();
+            navigation.navigate("verify");
+          }}
         />
       </View>
     );
   }
 
   function LoginContent() {
+    console.log("login_component rerendered");
     return (
       <View style={{ margin: "3%" }}>
         {/**Login & Email Wrapper */}
@@ -159,6 +220,7 @@ export default function Login() {
             <TextInput
               mode="outlined"
               label="Email"
+              value={login.email}
               error={errorEmail}
               theme={InputTheme}
               onChangeText={(text) => setLogin({ ...login, email: text })}
@@ -174,6 +236,7 @@ export default function Login() {
               <TextInput
                 mode="outlined"
                 label="Password"
+                value={login.password}
                 error={errorPWD}
                 theme={InputTheme}
                 secureTextEntry={secureEntry}
@@ -211,6 +274,7 @@ export default function Login() {
             <TextInput
               mode="outlined"
               label="License Key"
+              value={login.licenseKey}
               error={errorLicense}
               theme={InputTheme}
               onChangeText={(text) => setLogin({ ...login, licenseKey: text })}
@@ -225,6 +289,7 @@ export default function Login() {
             <TextInput
               mode="outlined"
               label="Device Name"
+              value={login.deviceName}
               error={errorDevice}
               theme={InputTheme}
               onChangeText={(text) => setLogin({ ...login, deviceName: text })}
