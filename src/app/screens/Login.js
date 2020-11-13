@@ -202,8 +202,8 @@ export default function Login() {
             end: { x: 1, y: 0 },
           }}
           onPress={() => {
-            //VerifyInputs();
-            navigation.navigate("verify");
+            VerifyInputs();
+            //navigation.navigate("verify");
           }}
         />
       </View>
