@@ -3,7 +3,9 @@ import DeviceInfo from "react-native-device-info";
 import { useDeviceOrientation } from "@react-native-community/hooks";
 import { useTheme, useNavigation } from "@react-navigation/native";
 import { isTablet } from "react-native-device-detection";
+import { generateLoginOTP } from "../api/ApiService";
 import {
+  Platform,
   SafeAreaView,
   StatusBar,
   StyleSheet,
@@ -33,6 +35,8 @@ export default function Login() {
 
   /** State Codes */
   //States
+  const [isEmulator, setIsEmulator] = useState(false);
+  const [isReady, setReady] = useState(false);
   const [login, setLogin] = useState({
     email: "",
     password: "",
@@ -53,23 +57,32 @@ export default function Login() {
   const [messagePWD, setPWDMessage] = useState("All Good");
 
   useEffect(() => {
-    // DeviceInfo.getBuildId().then((buildId) => {
-    //   console.log("Build ID", buildId);
-    // });
-    // console.log("Device Id", DeviceInfo.getDeviceId());
-    // console.log("Unique Id", DeviceInfo.getUniqueId());
-    Toast.show("Component Rerendered");
+    DeviceInfo.isEmulator().then((isEmulator) => {
+      console.log("isEmulator?", isEmulator);
+      setIsEmulator(isEmulator);
+    });
   }, []);
 
+  useEffect(() => {
+    if (isReady) {
+      GenerateOTP();
+    } else {
+      setLoading(false);
+    }
+  }, [isReady]);
+
   async function VerifyInputs() {
+    await setLoading(true);
     var pattern = /^[a-zA-Z0-9\-_]+(\.[a-zA-Z0-9\-_]+)*@[a-z0-9]+(\-[a-z0-9]+)*(\.[a-z0-9]+(\-[a-z0-9]+)*)*\.[a-z]{2,4}$/;
     if (login.email == "") {
       //Email cannot be empty
+      await setLoading(false);
       setEmailMessage("Email cannot be Blank!");
       setEmailError(true);
       return;
     } else if (login.email != "" && !pattern.test(login.email)) {
       //Email is not valid
+      await setLoading(false);
       setEmailMessage("This is not a valid email address!");
       setEmailError(true);
       return;
@@ -80,11 +93,13 @@ export default function Login() {
     }
     if (login.password == "") {
       //Password cannot be empty
+      await setLoading(false);
       setPWDMessage("Password cannot be Empty!");
       setPWDError(true);
       return;
     } else if (login.password.length < 5) {
       //Password must be minimum 5 characters.
+      await setLoading(false);
       setPWDMessage("Password must be of minimum 5 characters!");
       setPWDError(true);
       return;
@@ -95,6 +110,7 @@ export default function Login() {
     }
     if (login.licenseKey == "") {
       //License Key can't be Empty
+      await setLoading(false);
       setLicenseError(true);
       return;
     } else {
@@ -103,6 +119,7 @@ export default function Login() {
     }
     if (login.deviceName == "") {
       //Device Name can't be empty as well
+      await setLoading(false);
       setDeviceError(true);
       return;
     } else {
@@ -110,10 +127,54 @@ export default function Login() {
       setDeviceError(false);
     }
     Toast.show("Validation Successful");
+    console.log("login body", login);
+    GetDeviceDetails();
+  }
+
+  async function GetDeviceDetails() {
+    if (!isEmulator) {
+      //TODO Fill in the device details.
+      if (Platform.OS == "android") {
+        //Set Device brand name
+        await setLogin({
+          ...login,
+          brandName: DeviceInfo.getBrand(),
+          modelName: DeviceInfo.getModel(),
+          deviceId: DeviceInfo.getUniqueId(),
+          otp: "",
+          vendorId: "vendor123",
+        });
+        await setReady(true);
+      } else {
+        //For iOS
+      }
+    } else {
+      Toast.show("Oops, DeviceID not available for Emulator");
+    }
+  }
+
+  async function GenerateOTP() {
+    if (isReady) {
+      console.log("calling api");
+      await generateLoginOTP(login)
+        .then((data) => {
+          console.log("login success?", data);
+          Toast.show("An OTP has been sent to your Registered Email Id", Toast.LONG);
+          setLoading(false);
+          setReady(false);
+        })
+        .catch((error) => {
+          console.log("login error", error);
+          setLoading(false);
+          return;
+        });
+      navigation.navigate("verify", login);
+    } else {
+      console.log("still not ready");
+    }
   }
 
   function MobileContent() {
-    console.log("mobile_content rerendered");
     return (
       <View style={{ flex: 1, backgroundColor: colors.accent }}>
         <View style={{ flex: 1, justifyContent: "center", alignItems: "center" }}></View>
@@ -141,7 +202,6 @@ export default function Login() {
   }
 
   function TabContent() {
-    console.log("tab_content rerendered");
     return (
       <View
         style={{
@@ -177,7 +237,6 @@ export default function Login() {
   }
 
   function Header() {
-    console.log("header_component rerendered");
     return (
       <View style={{ margin: "5%" }}>
         <Title>Welcome User</Title>
@@ -187,12 +246,11 @@ export default function Login() {
   }
 
   function Footer() {
-    console.log("footer_component rerendered");
     return (
       <View style={{ margin: isTablet ? "5%" : "3.5%" }}>
         <Button
           title="Login"
-          loading={false}
+          loading={loading}
           ViewComponent={LinearGradient}
           containerStyle={{ maxWidth: isTablet ? "45%" : "100%" }}
           buttonStyle={{ height: 50, borderRadius: 10 }}
@@ -211,7 +269,6 @@ export default function Login() {
   }
 
   function LoginContent() {
-    console.log("login_component rerendered");
     return (
       <View style={{ margin: "3%" }}>
         {/**Login & Email Wrapper */}

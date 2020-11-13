@@ -1,16 +1,19 @@
 import React, { useState, useEffect } from "react";
 import { useTheme, useNavigation } from "@react-navigation/native";
+import { loginToShop } from "../api/ApiService";
 import { SafeAreaView, StatusBar, StyleSheet, View, Text, Alert } from "react-native";
 import { Button } from "react-native-elements";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 import LinearGradient from "react-native-linear-gradient";
 import OTPTextView from "react-native-otp-textinput";
 import Toast from "react-native-simple-toast";
 
-export default function Verification({ login }) {
-  //console.log('login object is', login);
+export default function Verification({ route }) {
+  const login = route.params;
   const navigation = useNavigation();
   const [pending, setPending] = useState(true);
   const { colors, dark } = useTheme();
+  console.log("login body", route.params);
 
   //State Code
   const [otp, setOtp] = useState("");
@@ -42,7 +45,7 @@ export default function Verification({ login }) {
     [navigation]
   );
 
-  function ValidateOTP() {
+  async function ValidateOTP() {
     if (otp == "") {
       Toast.show("ERROR: OTP cannot be blank!");
       return;
@@ -51,7 +54,29 @@ export default function Verification({ login }) {
       return;
     } else {
       //Success
-      Toast.show("OTP Validated");
+      login.otp = otp;
+      await loginToShop(login)
+        .then((data) => {
+          console.log("api verification", data);
+          //TODO Save
+          //1. data.shop (Shop Data)
+          //2. token (Auth token)
+          SaveToken(data.token);
+
+          //Validate User Session & navigate to Catalogue.
+        })
+        .catch((error) => {
+          console.log("failed to validate otp", error);
+          Toast.show("Invalid OTP. Please enter a valid otp");
+        });
+    }
+  }
+
+  async function SaveToken(token) {
+    try {
+      await AsyncStorage.setItem("@auth_token", token);
+    } catch (error) {
+      console.log("failed to save token");
     }
   }
 
