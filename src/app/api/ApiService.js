@@ -49,6 +49,20 @@ async function getAuthToken() {
   }
 }
 
+async function SessionValidator(response) {
+  try {
+    return new Promise(function (resolve, reject) {
+      if (!response.data.status && response.data.message == "session has expired") {
+        //TODO Logout of Session with Alert
+        reject("Session Expired");
+      } else {
+        //return original response
+        resolve(response);
+      }
+    });
+  } catch (error) {}
+}
+
 function generateLoginOTP(login) {
   console.log("executing login api");
   try {

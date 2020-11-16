@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback, useMemo } from "react";
 import DeviceInfo from "react-native-device-info";
 import { useDeviceOrientation } from "@react-native-community/hooks";
 import { useTheme, useNavigation } from "@react-navigation/native";
@@ -64,6 +64,10 @@ export default function Login() {
   }, []);
 
   useEffect(() => {
+    console.log("login", login);
+  }, [login]);
+
+  useEffect(() => {
     if (isReady) {
       GenerateOTP();
     } else {
@@ -72,7 +76,7 @@ export default function Login() {
   }, [isReady]);
 
   async function VerifyInputs() {
-    await setLoading(true);
+    setLoading(true);
     var pattern = /^[a-zA-Z0-9\-_]+(\.[a-zA-Z0-9\-_]+)*@[a-z0-9]+(\-[a-z0-9]+)*(\.[a-z0-9]+(\-[a-z0-9]+)*)*\.[a-z]{2,4}$/;
     if (login.email == "") {
       //Email cannot be empty
@@ -166,6 +170,7 @@ export default function Login() {
         .catch((error) => {
           console.log("login error", error);
           setLoading(false);
+          setReady(false);
           return;
         });
       navigation.navigate("verify", login);
@@ -187,7 +192,10 @@ export default function Login() {
             </View>
             <View style={{ flex: 5 }}>
               {/**For Content */}
-              <ScrollView style={{ flex: 1 }}>
+              <ScrollView
+                style={{ flex: 1 }}
+                keyboardShouldPersistTaps="always"
+                keyboardDismissMode="on-drag">
                 <LoginContent />
               </ScrollView>
             </View>
@@ -280,7 +288,7 @@ export default function Login() {
               value={login.email}
               error={errorEmail}
               theme={InputTheme}
-              onChangeText={(text) => setLogin({ ...login, email: text })}
+              onChangeText={(text) => setEmail(text)}
             />
             {errorEmail ? (
               <HelperText visible={true} type="error" theme={{ colors: { error: "red" } }}>

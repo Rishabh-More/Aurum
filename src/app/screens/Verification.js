@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { useTheme, useNavigation } from "@react-navigation/native";
+import { useDatabase } from "../config/Persistence";
 import { loginToShop } from "../api/ApiService";
 import { SafeAreaView, StatusBar, StyleSheet, View, Text, Alert } from "react-native";
 import { Button } from "react-native-elements";
@@ -11,6 +12,7 @@ import Toast from "react-native-simple-toast";
 export default function Verification({ route }) {
   const login = route.params;
   const navigation = useNavigation();
+  const realm = useDatabase();
   const [pending, setPending] = useState(true);
   const { colors, dark } = useTheme();
   console.log("login body", route.params);
@@ -60,6 +62,13 @@ export default function Verification({ route }) {
           console.log("api verification", data);
           //TODO Save
           //1. data.shop (Shop Data)
+          try {
+            realm.write(() => {
+              realm.create("Shop", data.shop);
+            });
+          } catch (error) {
+            console.log("failed to save to realm", error);
+          }
           //2. token (Auth token)
           SaveToken(data.token);
 
