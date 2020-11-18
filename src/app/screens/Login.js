@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback, useMemo } from "react";
+import React, { useState, useEffect } from "react";
 import DeviceInfo from "react-native-device-info";
 import { useDeviceOrientation } from "@react-native-community/hooks";
 import { useTheme, useNavigation } from "@react-navigation/native";
@@ -13,10 +13,9 @@ import {
   ScrollView,
   ImageBackground,
 } from "react-native";
-import { Title, Subheading, TextInput, HelperText } from "react-native-paper";
-import { Button } from "react-native-elements";
-import LinearGradient from "react-native-linear-gradient";
-import Icon from "react-native-vector-icons/MaterialCommunityIcons";
+import { LoginHeader } from "../components/LoginHeader";
+import { LoginFooter } from "../components/LoginFooter";
+import { LoginContent } from "../components/LoginContent";
 import Toast from "react-native-simple-toast";
 //TODO For Now, just use uniqueId for Login Api
 export default function Login() {
@@ -25,12 +24,11 @@ export default function Login() {
   const orientation = useDeviceOrientation();
   const { colors, dark } = useTheme();
 
-  const InputTheme = {
-    colors: {
-      placeholder: colors.accent,
-      primary: colors.accent,
-      error: "red",
-    },
+  const responsive = {
+    parent: isTablet && orientation.landscape ? "row" : "column",
+    main: { flex: isTablet ? 1.5 : 3 },
+    header: { flex: isTablet ? 0 : 1, justifyContent: isTablet ? "center" : null },
+    button: { flex: isTablet ? 0 : 1, justifyContent: isTablet ? "center" : null },
   };
 
   /** State Codes */
@@ -44,7 +42,6 @@ export default function Login() {
     deviceName: "",
   });
   const [loading, setLoading] = useState(false);
-  const [secureEntry, setSecureEntry] = useState(true);
 
   //Errors
   const [errorEmail, setEmailError] = useState(false);
@@ -179,201 +176,72 @@ export default function Login() {
     }
   }
 
-  function MobileContent() {
-    return (
-      <View style={{ flex: 1, backgroundColor: colors.accent }}>
-        <View style={{ flex: 1, justifyContent: "center", alignItems: "center" }}></View>
-        <View style={{ flex: 3, justifyContent: "center" }}>
-          {/**Main Content */}
-          <View style={[styles.content, { backgroundColor: colors.primary }]}>
-            <View style={{ flex: 1 }}>
-              {/**For Header */}
-              <Header />
-            </View>
-            <View style={{ flex: 5 }}>
-              {/**For Content */}
-              <ScrollView
-                style={{ flex: 1 }}
-                keyboardShouldPersistTaps="always"
-                keyboardDismissMode="on-drag">
-                <LoginContent />
-              </ScrollView>
-            </View>
-            <View style={{ flex: 1 }}>
-              {/**For Footer */}
-              <Footer />
-            </View>
-          </View>
-        </View>
-      </View>
-    );
-  }
-
-  function TabContent() {
-    return (
-      <View
-        style={{
-          flex: 1,
-          backgroundColor: colors.accent,
-          flexDirection: orientation.landscape ? "row" : "column",
-        }}>
-        <View
-          style={{
-            flex: 1,
-            justifyContent: "center",
-            alignItems: "center",
-          }}></View>
-        <View style={{ flex: 1.5, justifyContent: "center" }}>
-          {/**Main Content */}
-          <View style={[styles.content, { backgroundColor: colors.primary }]}>
-            {/**Header Wrapper */}
-            <View style={{ justifyContent: "center" }}>
-              {/**Header Title */}
-              <Header />
-            </View>
-            {/**Content Wrapper */}
-            <LoginContent />
-            {/**Footer Wrapper */}
-            <View style={{ justifyContent: "center" }}>
-              {/** Login Button */}
-              <Footer />
-            </View>
-          </View>
-        </View>
-      </View>
-    );
-  }
-
-  function Header() {
-    return (
-      <View style={{ margin: "5%" }}>
-        <Title>Welcome User</Title>
-        <Subheading>Please Sign In to Continue..</Subheading>
-      </View>
-    );
-  }
-
-  function Footer() {
-    return (
-      <View style={{ margin: isTablet ? "5%" : "3.5%" }}>
-        <Button
-          title="Login"
-          loading={loading}
-          ViewComponent={LinearGradient}
-          containerStyle={{ maxWidth: isTablet ? "45%" : "100%" }}
-          buttonStyle={{ height: 50, borderRadius: 10 }}
-          linearGradientProps={{
-            colors: [colors.accent, colors.accentLight],
-            start: { x: 1, y: 1 },
-            end: { x: 1, y: 0 },
-          }}
-          onPress={() => {
-            VerifyInputs();
-            //navigation.navigate("verify");
-          }}
-        />
-      </View>
-    );
-  }
-
-  function LoginContent() {
-    return (
-      <View style={{ margin: "3%" }}>
-        {/**Login & Email Wrapper */}
-        <View style={{ flexDirection: isTablet ? "row" : "column" }}>
-          <View style={styles.input}>
-            <TextInput
-              mode="outlined"
-              label="Email"
-              value={login.email}
-              error={errorEmail}
-              theme={InputTheme}
-              onChangeText={(text) => setEmail(text)}
-            />
-            {errorEmail ? (
-              <HelperText visible={true} type="error" theme={{ colors: { error: "red" } }}>
-                {messageEmail}
-              </HelperText>
-            ) : null}
-          </View>
-          <View style={styles.input}>
-            <View style={{ flexDirection: "row", alignItems: "center" }}>
-              <TextInput
-                mode="outlined"
-                label="Password"
-                value={login.password}
-                error={errorPWD}
-                theme={InputTheme}
-                secureTextEntry={secureEntry}
-                style={{ flex: 1, marginBottom: 5, marginEnd: isTablet ? 15 : 5 }}
-                onChangeText={(text) => setLogin({ ...login, password: text })}
-              />
-              <Button
-                icon={
-                  <Icon
-                    name={secureEntry ? "eye-off-outline" : "eye-outline"}
-                    size={30}
-                    color={colors.primary}
-                  />
-                }
-                buttonStyle={{
-                  width: 55,
-                  aspectRatio: 1,
-                  backgroundColor: colors.accent,
-                  borderRadius: 10,
-                }}
-                containerStyle={{ marginStart: 5 }}
-                onPress={async () => setSecureEntry(!secureEntry)}
-              />
-            </View>
-            {errorPWD ? (
-              <HelperText visible={true} type="error" theme={{ colors: { error: "red" } }}>
-                {messagePWD}
-              </HelperText>
-            ) : null}
-          </View>
-        </View>
-        {/**License & Device Wrapper */}
-        <View style={{ flexDirection: isTablet ? "row" : "column" }}>
-          <View style={styles.input}>
-            <TextInput
-              mode="outlined"
-              label="License Key"
-              value={login.licenseKey}
-              error={errorLicense}
-              theme={InputTheme}
-              onChangeText={(text) => setLogin({ ...login, licenseKey: text })}
-            />
-            {errorLicense ? (
-              <HelperText visible={true} type="error" theme={{ colors: { error: "red" } }}>
-                License Key cannot be Empty!
-              </HelperText>
-            ) : null}
-          </View>
-          <View style={styles.input}>
-            <TextInput
-              mode="outlined"
-              label="Device Name"
-              value={login.deviceName}
-              error={errorDevice}
-              theme={InputTheme}
-              onChangeText={(text) => setLogin({ ...login, deviceName: text })}
-            />
-            {errorDevice ? (
-              <HelperText visible={true} type="error" theme={{ colors: { error: "red" } }}>
-                Device Name cannot be empty
-              </HelperText>
-            ) : null}
-          </View>
-        </View>
-      </View>
-    );
-  }
-
   return (
     <SafeAreaView style={styles.container}>
       <StatusBar barStyle={"dark-content"} backgroundColor={colors.accent} />
-      {isTablet ? <TabContent /> : <MobileContent />}
+      <View
+        style={{
+          flex: 1,
+          flexDirection: responsive.parent,
+          backgroundColor: colors.accent,
+        }}>
+        <View style={{ flex: 1, justifyContent: "center", alignItems: "center" }}></View>
+        <View style={{ flex: responsive.main.flex, justifyContent: "center" }}>
+          <View style={[styles.content, { backgroundColor: colors.primary }]}>
+            <View
+              style={{
+                flex: responsive.header.flex,
+                justifyContent: responsive.header.justifyContent,
+              }}>
+              {/**For Header */}
+              <LoginHeader />
+            </View>
+            {isTablet ? (
+              <LoginContent
+                {...{
+                  login,
+                  setLogin,
+                  errorEmail,
+                  errorPWD,
+                  errorLicense,
+                  errorDevice,
+                  messageEmail,
+                  messagePWD,
+                }}
+              />
+            ) : (
+              <View style={{ flex: 5 }}>
+                {/**For Content */}
+                <ScrollView
+                  style={{ flex: 1 }}
+                  keyboardShouldPersistTaps="always"
+                  keyboardDismissMode="on-drag">
+                  <LoginContent
+                    {...{
+                      login,
+                      setLogin,
+                      errorEmail,
+                      errorPWD,
+                      errorLicense,
+                      errorDevice,
+                      messageEmail,
+                      messagePWD,
+                    }}
+                  />
+                </ScrollView>
+              </View>
+            )}
+            <View
+              style={{
+                flex: responsive.button.flex,
+                justifyContent: responsive.button.justifyContent,
+              }}>
+              {/**For Footer */}
+              <LoginFooter {...{ loading, VerifyInputs }} />
+            </View>
+          </View>
+        </View>
+      </View>
     </SafeAreaView>
   );
 }
@@ -388,11 +256,5 @@ const styles = StyleSheet.create({
     margin: isTablet ? "8%" : "5%",
     justifyContent: "center",
     borderRadius: 25,
-  },
-  input: {
-    flex: 1,
-    margin: 5,
-    marginStart: isTablet ? 20 : 10,
-    marginEnd: isTablet ? 20 : 10,
   },
 });

@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { useTheme, useNavigation } from "@react-navigation/native";
+import { useAuthorization } from "./../navigation/Authorizer";
 import { useDatabase } from "../config/Persistence";
 import { loginToShop } from "../api/ApiService";
 import { SafeAreaView, StatusBar, StyleSheet, View, Text, Alert } from "react-native";
@@ -12,6 +13,7 @@ import Toast from "react-native-simple-toast";
 export default function Verification({ route }) {
   const login = route.params;
   const navigation = useNavigation();
+  const { setAuthorization } = useAuthorization();
   const realm = useDatabase();
   const [pending, setPending] = useState(true);
   const { colors, dark } = useTheme();
@@ -48,7 +50,7 @@ export default function Verification({ route }) {
   );
 
   async function ValidateOTP() {
-    if (otp == "") {
+    if (otp === "") {
       Toast.show("ERROR: OTP cannot be blank!");
       return;
     } else if (otp != "" && otp.length < 4) {
@@ -60,32 +62,41 @@ export default function Verification({ route }) {
       await loginToShop(login)
         .then((data) => {
           console.log("api verification", data);
-          //TODO Save
-          //1. data.shop (Shop Data)
-          try {
-            realm.write(() => {
-              realm.create("Shop", data.shop);
-            });
-          } catch (error) {
-            console.log("failed to save to realm", error);
-          }
-          //2. token (Auth token)
-          SaveToken(data.token);
-
-          //Validate User Session & navigate to Catalogue.
+          SaveCredentials(data);
         })
         .catch((error) => {
           console.log("failed to validate otp", error);
           Toast.show("Invalid OTP. Please enter a valid otp");
+          return;
         });
     }
   }
 
-  async function SaveToken(token) {
+  async function SaveCredentials(data) {
+    //TODO Save
+    //1. data.shop (Shop Data)
     try {
-      await AsyncStorage.setItem("@auth_token", token);
+      await realm.write(() => {
+        realm.create("Shop", data.shop);
+      });
     } catch (error) {
-      console.log("failed to save token");
+      console.log("failed to save to realm", error);
+    }
+    //2. token (Auth token)
+    await SaveSession(data.token).catch((error) => {
+      console.log("couldn't save session to local", error);
+    });
+    //TODO setAuthorization& navigate to Navigation Drawer
+    await setAuthorization(true);
+  }
+
+  async function SaveSession(token) {
+    const auth_token = ["@auth_token", token];
+    const session = ["@auth_session", JSON.stringify(true)];
+    try {
+      await AsyncStorage.multiSet([auth_token, session]);
+    } catch (error) {
+      console.log("failed to save session", error);
     }
   }
 

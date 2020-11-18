@@ -1,16 +1,13 @@
-import AsyncStorage from "@react-native-async-storage/async-storage";
 import Axios from "axios";
+import { getAuthToken } from "../config/Persistence";
 
 const BASE_URL = "http://35.188.220.243:1337/";
-//const BASE_URL = "http://139.59.26.142:1337/";
-
-const AUTH_TOKEN = getAuthToken(); //"Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJkYXRhIjpbeyJjcmVhdGVkQXQiOiIyMDIwLTExLTEzVDA4OjU2OjIyLjAwMFoiLCJ1cGRhdGVkQXQiOiIyMDIwLTExLTEzVDA5OjE3OjI1LjAwMFoiLCJpZCI6MTU3LCJkZXZpY2VOYW1lIjoiT25lUGx1cyAzVCBBbmRyb2lkIiwiZGV2aWNlSWQiOiIyMDU5NzM3MWYxMTA3ZWM5IiwiYnJhbmROYW1lIjoiT25lUGx1cyIsIm1vZGVsTmFtZSI6Ik9ORVBMVVMgQTMwMDMiLCJvdHAiOjU2ODksIm90cENyZWF0ZWRBdCI6IjIwMjAtMTEtMTNUMDk6MTc6MjUuMDAwWiIsImF1dGhFeHBpcmVBdCI6bnVsbCwib3RwRXhwaXJlQXQiOiIyMDIwLTExLTEzVDA5OjI3OjI1LjAwMFoiLCJkZWxldGVkQXQiOm51bGwsInNob3BJZCI6MTE1fV0sImlhdCI6MTYwNTI1OTA3MSwiZXhwIjoxNjA1OTE0MjcxfQ.jnpzUUO-AJHEyHdUG2LMIK-K7ktTZ1MspiWgPiNnteQ";
 
 const SHOP_LOGIN = "shoplogin";
 const GENERATE_OTP = "generateotp";
 const SHOP = "shop";
 
-const FETCH_PRODUCTS = "products/115";
+const FETCH_PRODUCTS = "products";
 const GET_CUSTOMERS = "customers";
 const POST_CUSTOMERS = "customer";
 
@@ -30,29 +27,10 @@ let service = Axios.create({
   timeout: 10000,
 });
 
-async function setAuthTokenToService(token) {
-  service.interceptors.request.use(function (config) {
-    config.headers.Authorization = `Bearer ${token}`;
-    return config;
-  });
-}
-
-async function getAuthToken() {
-  try {
-    const token = await AsyncStorage.getItem("@auth_token");
-    if (token != null) {
-      return token;
-    }
-  } catch (error) {
-    console.log("couldn't fetch token from storage");
-    return "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJkYXRhIjpbeyJjcmVhdGVkQXQiOiIyMDIwLTExLTEzVDA4OjU2OjIyLjAwMFoiLCJ1cGRhdGVkQXQiOiIyMDIwLTExLTEzVDA5OjE3OjI1LjAwMFoiLCJpZCI6MTU3LCJkZXZpY2VOYW1lIjoiT25lUGx1cyAzVCBBbmRyb2lkIiwiZGV2aWNlSWQiOiIyMDU5NzM3MWYxMTA3ZWM5IiwiYnJhbmROYW1lIjoiT25lUGx1cyIsIm1vZGVsTmFtZSI6Ik9ORVBMVVMgQTMwMDMiLCJvdHAiOjU2ODksIm90cENyZWF0ZWRBdCI6IjIwMjAtMTEtMTNUMDk6MTc6MjUuMDAwWiIsImF1dGhFeHBpcmVBdCI6bnVsbCwib3RwRXhwaXJlQXQiOiIyMDIwLTExLTEzVDA5OjI3OjI1LjAwMFoiLCJkZWxldGVkQXQiOm51bGwsInNob3BJZCI6MTE1fV0sImlhdCI6MTYwNTI1OTA3MSwiZXhwIjoxNjA1OTE0MjcxfQ.jnpzUUO-AJHEyHdUG2LMIK-K7ktTZ1MspiWgPiNnteQ";
-  }
-}
-
 async function SessionValidator(response) {
   try {
     return new Promise(function (resolve, reject) {
-      if (!response.data.status && response.data.message == "session has expired") {
+      if (!response.data.status && response.data.message === "session has expired") {
         //TODO Logout of Session with Alert
         reject("Session Expired");
       } else {
@@ -63,13 +41,13 @@ async function SessionValidator(response) {
   } catch (error) {}
 }
 
-function generateLoginOTP(login) {
-  console.log("executing login api");
+async function generateLoginOTP(login) {
+  var token = await getAuthToken();
   try {
     return new Promise(async function (resolve, reject) {
       const response = await service.post(GENERATE_OTP, login, {
         headers: {
-          Authorization: AUTH_TOKEN,
+          Authorization: `Bearer ${token}`,
         },
       });
       if (response.data.status) {
@@ -84,16 +62,35 @@ function generateLoginOTP(login) {
   }
 }
 
-function loginToShop(login) {
+async function loginToShop(login) {
+  var token = await getAuthToken();
   try {
     return new Promise(async function (resolve, reject) {
       const response = await service.post(SHOP_LOGIN, login, {
         headers: {
-          Authorization: AUTH_TOKEN,
+          Authorization: `Bearer ${token}`,
         },
       });
       if (response.data.status) {
         resolve(response.data.data); //TODO resolve either the data or message for login api
+      } else {
+        reject(response.data.message);
+      }
+    });
+  } catch (error) {
+    console.log("request error", error.message);
+  }
+}
+
+async function getProductsFromShop(shopId) {
+  var token = await getAuthToken();
+  try {
+    return new Promise(async function (resolve, reject) {
+      const response = await service.get(`${FETCH_PRODUCTS}/${shopId}`, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      if (response.data.status) {
+        resolve(response.data.data);
       } else {
         reject(response.data.message);
       }
@@ -118,4 +115,4 @@ function TestSampleApi() {
   }
 }
 
-export { TestSampleApi, generateLoginOTP, loginToShop };
+export { TestSampleApi, generateLoginOTP, loginToShop, getProductsFromShop };
