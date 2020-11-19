@@ -8,7 +8,9 @@ import { useAuthorization } from "../navigation/Authorizer";
 import { logoutFromShop } from "../api/ApiService";
 import { DrawerContentScrollView, DrawerItem } from "@react-navigation/drawer";
 import { SafeAreaView, StyleSheet, View, Alert, Text } from "react-native";
-import { Drawer } from "react-native-paper";
+import { Drawer, Divider } from "react-native-paper";
+import { DrawerHeaderContent } from "./DrawerHeaderContent";
+import ToggleSwitch from "toggle-switch-react-native";
 import Icon from "react-native-vector-icons/MaterialCommunityIcons";
 
 export function CustomDrawerContent(props) {
@@ -18,18 +20,45 @@ export function CustomDrawerContent(props) {
   const { colors, dark, name } = theme;
 
   const realm = useDatabase();
-  const [shop, setShop] = useState({});
+  const [shop, setShop] = useState({
+    company: {
+      companyLogoUrl: "https://www.gravatar.com/avatar/205e460b479e2e5b48aec07710c08d50",
+      companyName: "Getting Shop Details...",
+      email: "Getting Shop Details...",
+      id: 0,
+    },
+    email: "Getting Shop Details...",
+    id: 0,
+    shopName: "Getting Shop Details...",
+  });
 
   useEffect(() => {
+    getShopData();
+  }, []);
+
+  useEffect(() => {
+    SaveThemeSettings();
+  }, [isDarkTheme]);
+
+  async function getShopData() {
     try {
-      let shop = realm.objects("Shop");
+      let shop = await realm.objects("Shop");
       console.log("Persisted Shop Data", shop);
       console.log("Shop Id", shop[0].id);
-      setShop(shop[0]);
+      await setShop(shop[0]);
     } catch (error) {
       console.log("failed to retrieve shop object", error);
     }
-  }, []);
+  }
+
+  async function SaveThemeSettings() {
+    try {
+      console.log("saving in storage: DarkTheme", isDarkTheme);
+      await AsyncStorage.setItem("@app_theme_isDark", JSON.stringify(isDarkTheme));
+    } catch (error) {
+      console.log("failed to save theme", error);
+    }
+  }
 
   function ConfirmSignOut() {
     Alert.alert("Log Out", "Are you sure you wish to Log Out from the app?", [
@@ -82,8 +111,51 @@ export function CustomDrawerContent(props) {
   return (
     <SafeAreaView style={{ flex: 1 }}>
       <DrawerContentScrollView {...props}>
-        <View>
-          <Text>This is Custom Drawer Content</Text>
+        <View style={drawer.drawerContainer}>
+          <DrawerHeaderContent shop={shop} theme={theme} />
+          <Divider />
+          <Drawer.Section style={drawer.drawerSection}>
+            <DrawerItem
+              icon={({ size }) => <Icon name="home-outline" color={colors.accent} size={size} />}
+              label={() => <Text style={{ color: colors.text }}>Catalogue</Text>}
+              onPress={() => props.navigation.navigate("Home")}
+            />
+            <DrawerItem
+              icon={({ size }) => <Icon name="cart-outline" color={colors.accent} size={size} />}
+              label={() => <Text style={{ color: colors.text }}>Cart</Text>}
+              onPress={() => props.navigation.navigate("Cart")}
+            />
+            <DrawerItem
+              icon={({ size }) => <Icon name="link-variant" color={colors.accent} size={size} />}
+              label={() => <Text style={{ color: colors.text }}>Catalogue Links</Text>}
+              onPress={() => props.navigation.navigate("Links")}
+            />
+            <DrawerItem
+              icon={({ size }) => <Icon name="account-outline" color={colors.accent} size={size} />}
+              label={() => <Text style={{ color: colors.text }}>About Us</Text>}
+            />
+          </Drawer.Section>
+          <Drawer.Section title="Theme">
+            <View style={drawer.preferences}>
+              <View style={{ flex: 1, flexDirection: "row" }}>
+                <Icon
+                  style={{ marginLeft: 5, marginRight: 10 }}
+                  name={dark ? "moon-waning-crescent" : "white-balance-sunny"}
+                  color={colors.accent}
+                  size={20}
+                />
+                <Text style={{ color: colors.text }}>{name}</Text>
+              </View>
+              <View>
+                <ToggleSwitch
+                  isOn={dark}
+                  onColor={colors.accent}
+                  size="medium"
+                  onToggle={() => setDarkTheme(!isDarkTheme)}
+                />
+              </View>
+            </View>
+          </Drawer.Section>
         </View>
       </DrawerContentScrollView>
       <Drawer.Section style={drawer.bottomSection}>

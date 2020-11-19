@@ -28,11 +28,11 @@ export default function Catalogue() {
   }, []);
 
   useEffect(() => {
-    console.log("Now Shop Data is", shop);
+    //console.log("Now Shop Data is", shop);
     if (shop.id != null) {
       getProductsFromShop(shop.id)
         .then((data) => {
-          console.log("Shop Products", data);
+          //console.log("Shop Products", data);
         })
         .catch((error) => {
           console.log("Failed to get products from shop", error);
