@@ -15,7 +15,7 @@ export default function Verification({ route }) {
   const navigation = useNavigation();
   const { setAuthorization } = useAuthorization();
   const realm = useDatabase();
-  const [pending, setPending] = useState(true);
+  const [loading, setloading] = useState(false);
   const { colors, dark } = useTheme();
   console.log("login body", route.params);
 
@@ -25,12 +25,7 @@ export default function Verification({ route }) {
   useEffect(
     () =>
       navigation.addListener("beforeRemove", (nav) => {
-        if (!pending) {
-          return;
-        }
-
         nav.preventDefault();
-
         Alert.alert(
           "Sure you want to leave?",
           "You haven't verified your otp yet. Would you like to resend a new otp or leave?",
@@ -50,11 +45,14 @@ export default function Verification({ route }) {
   );
 
   async function ValidateOTP() {
+    setloading(true);
     if (otp === "") {
       Toast.show("ERROR: OTP cannot be blank!");
+      setloading(false);
       return;
     } else if (otp != "" && otp.length < 4) {
       Toast.show("ERROR: OTP must be of 4 Digits!");
+      setloading(false);
       return;
     } else {
       //Success
@@ -67,6 +65,7 @@ export default function Verification({ route }) {
         .catch((error) => {
           console.log("failed to validate otp", error);
           Toast.show("Invalid OTP. Please enter a valid otp");
+          setloading(false);
           return;
         });
     }
@@ -85,7 +84,10 @@ export default function Verification({ route }) {
     //2. token (Auth token)
     await SaveSession(data.token).catch((error) => {
       console.log("couldn't save session to local", error);
+      setloading(false);
+      return;
     });
+    setloading(false);
     //TODO setAuthorization& navigate to Navigation Drawer
     await setAuthorization(true);
   }
@@ -138,7 +140,7 @@ export default function Verification({ route }) {
         />
         <Button
           title="Verify OTP"
-          loading={false}
+          loading={loading}
           ViewComponent={LinearGradient}
           containerStyle={{ marginTop: 30, width: "75%", alignSelf: "center" }}
           buttonStyle={{ height: 50, margin: 10, borderRadius: 15 }}

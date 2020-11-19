@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { getProductsFromShop } from "../api/ApiService";
-import { useDatabase } from "../config/Persistence";
+import { getAuthToken, useDatabase } from "../config/Persistence";
 import { SafeAreaView, StyleSheet, Text } from "react-native";
 
 export default function Catalogue() {
@@ -19,6 +19,9 @@ export default function Catalogue() {
       console.log("Persisted Shop Data", shop);
       console.log("Shop Id", shop[0].id);
       setShop(shop[0]);
+      getAuthToken().then((token) => {
+        console.log("token is", token);
+      });
     } catch (error) {
       console.log("failed to retrieve shop object", error);
     }

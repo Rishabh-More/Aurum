@@ -100,6 +100,24 @@ async function getProductsFromShop(shopId) {
   }
 }
 
+async function logoutFromShop(shopId, deviceId) {
+  var token = await getAuthToken();
+  try {
+    return new Promise(async function (resolve, reject) {
+      const response = await service.post(`${LOG_OUT}/${shopId}/${deviceId}`, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      if (response.data.status) {
+        resolve(response.data.status);
+      } else {
+        reject(response.data.message);
+      }
+    });
+  } catch (error) {
+    console.log("request error", error.message);
+  }
+}
+
 function TestSampleApi() {
   try {
     return new Promise(async function (resolve, reject) {
@@ -115,4 +133,4 @@ function TestSampleApi() {
   }
 }
 
-export { TestSampleApi, generateLoginOTP, loginToShop, getProductsFromShop };
+export { TestSampleApi, generateLoginOTP, loginToShop, getProductsFromShop, logoutFromShop };
