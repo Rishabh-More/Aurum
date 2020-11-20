@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { useStore } from "../config/Store";
+import { useDatabase } from "../config/Persistence";
 import { useDeviceOrientation } from "@react-native-community/hooks";
 import { useNavigation, useTheme } from "@react-navigation/native";
 import { isPhone, isTablet } from "react-native-device-detection";
@@ -12,6 +13,7 @@ import { Fold } from "react-native-animated-spinkit";
 import Toast from "react-native-simple-toast";
 
 export default function Customers() {
+  const realm = useDatabase();
   const navigation = useNavigation();
   const orientation = useDeviceOrientation();
   const { colors, dark } = useTheme();
@@ -26,7 +28,7 @@ export default function Customers() {
   const [selected, setSelected] = useState({
     id: 0,
     isPrimary: 1,
-    shopId: 115,
+    shopId: state.shop.id,
     name: "",
     email: "",
     phone: "",
@@ -41,7 +43,7 @@ export default function Customers() {
   const [errorEmail, setEmailError] = useState(false);
   const [errorAddress, setAddressError] = useState(false);
   const [order, setOrder] = useState({
-    shopId: "115",
+    shopId: state.shop.id.toString(),
     customerId: 0,
     remarks: "",
     products: state.data.cart,
@@ -145,6 +147,18 @@ export default function Customers() {
     //ExportOrder();
   }
 
+  async function ClearCartItems() {
+    try {
+      await realm.write(() => {
+        let cart = realm.objects("Cart");
+        realm.delete(cart);
+      });
+      await dispatch({ type: "CLEAR_CART" });
+    } catch (error) {
+      console.log("failed to clear cart", error);
+    }
+  }
+
   async function ExportOrder() {
     if (isReady) {
       let packet = {};
@@ -155,7 +169,8 @@ export default function Customers() {
             feature: "order",
             data: data,
           };
-          dispatch({ type: "CLEAR_CART" });
+          //dispatch({ type: "CLEAR_CART" });
+          ClearCartItems();
           setLoading(false);
         })
         .catch((error) => {

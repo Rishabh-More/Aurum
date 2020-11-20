@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { useStore } from "../config/Store";
+import { useDatabase } from "../config/Persistence";
 import { useNavigation, useTheme } from "@react-navigation/native";
 import { isPhone, isTablet } from "react-native-device-detection";
 import { SafeAreaView, View, Text, StyleSheet, ScrollView } from "react-native";
@@ -10,6 +11,7 @@ import { Button } from "react-native-elements";
 import { generateCatalogueLink } from "../api/ApiService";
 
 export default function LinkOptions() {
+  const realm = useDatabase();
   const navigation = useNavigation();
   const { colors, dark } = useTheme();
 
@@ -49,6 +51,18 @@ export default function LinkOptions() {
     ExportCatalogueLink();
   }
 
+  async function ClearCartItems() {
+    try {
+      await realm.write(() => {
+        let cart = realm.objects("Cart");
+        realm.delete(cart);
+      });
+      await dispatch({ type: "CLEAR_CART" });
+    } catch (error) {
+      console.log("failed to clear cart", error);
+    }
+  }
+
   async function ExportCatalogueLink() {
     //TODO get all design numbers from cart as an array.
     console.log("exporting final object", link);
@@ -59,7 +73,8 @@ export default function LinkOptions() {
           feature: "link",
           data: data,
         };
-        dispatch({ type: "CLEAR_CART" });
+        //dispatch({ type: "CLEAR_CART" });
+        ClearCartItems();
       })
       .catch((error) => {
         console.log("generate link api error", error);
