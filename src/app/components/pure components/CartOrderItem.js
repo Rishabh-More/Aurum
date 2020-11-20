@@ -1,5 +1,6 @@
 import React, { useEffect, useState, useRef } from "react";
 import { useStore } from "../../config/Store";
+import { useDatabase } from "../../config/Persistence";
 import { useTheme } from "@react-navigation/native";
 import { usePrevious } from "../../hooks/usePrevious";
 import { isPhone, isTablet } from "react-native-device-detection";
@@ -14,6 +15,7 @@ import Toast from "react-native-simple-toast";
 import Counter from "react-native-counters";
 
 const CartOrderItem = ({ cart }) => {
+  const realm = useDatabase();
   const { colors, dark } = useTheme();
 
   //State Codes
@@ -23,23 +25,22 @@ const CartOrderItem = ({ cart }) => {
     skuNumber: cart.skuNumber,
     metalPurity: cart.metalPurity,
     metalType: cart.metalType,
-    orderProductRemarks: "",
+    orderProductRemarks: cart.orderProductRemarks,
     orderProductQuantity: 1,
   });
   const prevObject = usePrevious(props);
   console.log("initial props object", props);
   console.log("previous object", prevObject);
 
-  useEffect(() => {
-    //By Default add orderProductQuantity & orderProductRemarks
-    //to cart item
-    dispatch({ type: "UPDATE_CART_ITEM", payload: props });
-  }, []);
-
   async function removeFromCart() {
     try {
       const index = state.data.cart.map((item) => item.skuNumber).indexOf(cart.skuNumber);
       console.log("index is", index);
+      await realm.write(() => {
+        let product = realm.objects("Cart");
+        let index = product.map((item) => item.skuNumber).indexOf(cart.skuNumber);
+        realm.delete(product[index]);
+      });
       await dispatch({ type: "DELETE_FROM_CART", payload: index });
       Toast.show(`Removed item ${cart.skuNumber}`);
     } catch (error) {
@@ -242,7 +243,7 @@ const CartOrderItem = ({ cart }) => {
                 alignItems: "center",
               }}>
               <Counter
-                start={1}
+                start={cart.orderProductQuantity}
                 min={1}
                 max={100}
                 minusIcon={(isMinusDiabled) => minusIcon(isMinusDiabled)}
@@ -274,6 +275,24 @@ const CartOrderItem = ({ cart }) => {
                   //Because we have just updated the item
                   if (!updated) setUpdated(true);
                   //Step 2: Dispatch the object to store
+                  try {
+                    await realm.write(() => {
+                      realm.create(
+                        "Cart",
+                        {
+                          id: cart.id,
+                          metalPurity: props.metalPurity,
+                          metalType: props.metalType,
+                          orderProductQuantity: props.orderProductQuantity,
+                          orderProductRemarks: props.orderProductRemarks,
+                        },
+                        "modified"
+                      );
+                    });
+                    await dispatch({ type: "UPDATE_CART_ITEM", payload: props });
+                  } catch (error) {
+                    console.log("failed to update cart item", error);
+                  }
                   await dispatch({ type: "UPDATE_CART_ITEM", payload: props });
                   Toast.show(`Item Updated: ${cart.skuNumber}`);
                 }}

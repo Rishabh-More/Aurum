@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { isPhone } from "react-native-device-detection";
 import { useStore } from "../../config/Store";
+import { useDatabase } from "../../config/Persistence";
 import { useDeviceOrientation, useDimensions } from "@react-native-community/hooks";
 import { useTheme, useNavigation } from "@react-navigation/native";
 import { StyleSheet, View, Text, TouchableOpacity } from "react-native";
@@ -15,6 +16,7 @@ const SingleCatalogueItem = ({ product, columns }) => {
   const orientation = useDeviceOrientation();
   const dimensions = useDimensions();
   const navigation = useNavigation();
+  const realm = useDatabase();
   const { colors, dark } = useTheme();
 
   //State Code
@@ -44,7 +46,18 @@ const SingleCatalogueItem = ({ product, columns }) => {
       Toast.show("Item is already added to Cart");
     } else {
       //Item does not exist in Cart. Add to it
-      await dispatch({ type: "ADD_TO_CART", payload: rest });
+      try {
+        //TODO Add Product to Realm as well
+        await realm.write(() => {
+          realm.create("Cart", rest);
+        });
+        await dispatch({
+          type: "ADD_TO_CART",
+          payload: { ...rest, orderProductQuantity: 1, orderProductRemarks: "" },
+        });
+      } catch (error) {
+        console.log("failed add to cart", error);
+      }
     }
   }
 

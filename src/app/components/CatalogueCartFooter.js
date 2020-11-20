@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import { useStore } from "../config/Store";
+import { useDatabase } from "../config/Persistence";
 import { useTheme, useNavigation } from "@react-navigation/native";
 import { View, Text } from "react-native";
 import { Title } from "react-native-paper";
@@ -10,10 +11,24 @@ import LinearGradient from "react-native-linear-gradient";
 export function CatalogueCartFooter() {
   const { colors, dark } = useTheme();
   const navigation = useNavigation();
+  const realm = useDatabase();
 
   //State Code
   const { state, dispatch } = useStore();
   const [visible, setVisible] = useState(false);
+
+  async function ClearCartItems() {
+    try {
+      await realm.write(() => {
+        let cart = realm.objects("Cart");
+        realm.delete(cart);
+      });
+      await dispatch({ type: "CLEAR_CART" });
+    } catch (error) {
+      console.log("failed to clear cart", error);
+    }
+  }
+
   return (
     <View
       style={{
@@ -37,7 +52,7 @@ export function CatalogueCartFooter() {
         <Button
           icon={<Icon name="delete-sweep-outline" size={24} color={colors.accent} />}
           buttonStyle={{ height: 50, width: 50, backgroundColor: "#fff", borderRadius: 25 }}
-          onPress={() => dispatch({ type: "CLEAR_CART" })}
+          onPress={() => ClearCartItems()}
         />
         <Button
           title="Checkout"

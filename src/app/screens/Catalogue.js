@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useRef } from "react";
 import { useStore } from "../config/Store";
+import { useDatabase } from "../config/Persistence";
 import { useTheme } from "@react-navigation/native";
 import useSortFilter from "../hooks/useSortFilter";
 import { useDeviceOrientation, useDimensions } from "@react-native-community/hooks";
@@ -17,6 +18,7 @@ export default function Catalogue() {
   const dimensions = useDimensions();
   const orientation = useDeviceOrientation();
   const { colors, dark } = useTheme();
+  const realm = useDatabase();
   const overlay = useRef(true);
 
   const phoneColumns = isPhone && orientation.portrait ? 2 : 3;
@@ -34,6 +36,9 @@ export default function Catalogue() {
         console.log("api response", data);
         dispatch({ type: "SET_PRODUCTS", payload: data });
         overlay.current = !overlay.current;
+
+        //Check for Saved Cart items
+        CheckSavedCart();
       })
       .catch((error) => {
         console.log("Failed to get products from shop", error);
@@ -47,6 +52,10 @@ export default function Catalogue() {
       overlay.current = false;
     }
   }, [state.data.products]);
+
+  useEffect(() => {
+    console.log("cart updated", state.data.cart);
+  }, [state.data.cart]);
 
   useEffect(() => {
     console.log("filter updated", state.data.filter);
@@ -81,6 +90,21 @@ export default function Catalogue() {
   useEffect(() => {
     console.log("orientation changed", orientation);
   }, [orientation]);
+
+  async function CheckSavedCart() {
+    try {
+      let cart = await realm.objects("Cart");
+      if (cart.length != 0 && state.data.cart.length === 0) {
+        //There are saved cart items, push these to Store immediately
+        cart.forEach((cart) => {
+          console.log("cart item?", cart);
+          dispatch({ type: "ADD_ALL_TO_CART", payload: cart });
+        });
+      }
+    } catch (error) {
+      console.log("failed to read stored cart", error);
+    }
+  }
 
   return (
     <SafeAreaView style={[styles.container, { backgroundColor: colors.accentDark }]}>

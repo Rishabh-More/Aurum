@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { useStore } from "../config/Store";
+import { useDatabase } from "../config/Persistence";
 import { useTheme, useNavigation } from "@react-navigation/native";
 import { useDeviceOrientation, useDimensions } from "@react-native-community/hooks";
 import { isTablet, isPhone } from "react-native-device-detection";
@@ -11,6 +12,7 @@ import { Button } from "react-native-elements";
 import Toast from "react-native-simple-toast";
 
 export default function Cart() {
+  const realm = useDatabase();
   const { colors, dark } = useTheme();
   const navigation = useNavigation();
   const orientation = useDeviceOrientation();
@@ -25,6 +27,18 @@ export default function Cart() {
     //If No feature has been selected, ask user for feature
     RequestFeature();
   }, []);
+
+  async function ClearCartItems() {
+    try {
+      await realm.write(() => {
+        let cart = realm.objects("Cart");
+        realm.delete(cart);
+      });
+      await dispatch({ type: "CLEAR_CART" });
+    } catch (error) {
+      console.log("failed to clear cart", error);
+    }
+  }
 
   function RequestFeature() {
     if (state.indicators.requestedFeature == "" && state.data.cart.length != 0) {
@@ -111,9 +125,7 @@ export default function Cart() {
           type="outline"
           title="Clear Cart"
           onPress={() =>
-            state.data.cart.length != 0
-              ? dispatch({ type: "CLEAR_CART" })
-              : Toast.show("No Items to clear")
+            state.data.cart.length != 0 ? ClearCartItems() : Toast.show("No Items to clear")
           }
         />
         <Button

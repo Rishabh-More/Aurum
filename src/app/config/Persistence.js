@@ -1,10 +1,27 @@
 import React, { createContext, useContext } from "react";
+import DeviceInfo from "react-native-device-info";
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import { ShopSchema, CompanySchema, AddressSchema } from "../config/Schemas";
+import { ShopSchema, CompanySchema, AddressSchema, CartSchema } from "../config/Schemas";
+import { logoutFromShop } from "../api/ApiService";
 //import { Realm } from "realm";
 const Realm = require("realm");
 const DatabaseContext = createContext();
 const useDatabase = () => useContext(DatabaseContext);
+
+let realm = new Realm({
+  path: "PersistantDatabase.realm",
+  schema: [ShopSchema, CompanySchema, AddressSchema, CartSchema],
+  schemaVersion: 5,
+});
+
+async function SaveThemeSettings() {
+  try {
+    console.log("saving in storage: DarkTheme", isDarkTheme);
+    await AsyncStorage.setItem("@app_theme_isDark", JSON.stringify(isDarkTheme));
+  } catch (error) {
+    console.log("failed to save theme", error);
+  }
+}
 
 async function getSessionCredentials() {
   try {
@@ -34,14 +51,57 @@ async function getAuthToken() {
   }
 }
 
-let realm = new Realm({
-  path: "PersistantDatabase.realm",
-  schema: [ShopSchema, CompanySchema, AddressSchema],
-  schemaVersion: 1,
-});
+async function LogoutUser(shopId) {
+  try {
+    return new Promise(async function (resolve, reject) {
+      //TODO Call signout api
+      await logoutFromShop(shopId, DeviceInfo.getUniqueId())
+        .then(async (status) => {
+          console.log("logged out?", status);
+          await ClearUserSession();
+          resolve(status);
+        })
+        .catch((error) => {
+          console.log("Couldn't sign out", error);
+          reject(error);
+        });
+    });
+  } catch (error) {
+    console.log("[PERSISTENCE] Failed to logout", error);
+  }
+}
+
+async function ClearUserSession() {
+  const keys = ["@auth_session", "@auth_token"];
+  //TODO Clear Shop Data from Realm DB
+  try {
+    realm.write(() => {
+      let shop = await realm.objects("Shop");
+      await realm.delete(shop);
+      let cart = await realm.objects("Cart");
+      await realm.delete(cart);
+    })
+  } catch (error) {
+    console.log("failed to clear objects", error);
+    return;
+  }
+  //TODO Clear Session and token from AsyncStorage
+  try {
+    await AsyncStorage.multiRemove(keys);
+  } catch (error) {
+    console.log("failed to remove from local", error);
+  }
+}
 
 const DatabaseProvider = ({ children }) => {
   return <DatabaseContext.Provider value={realm}>{children}</DatabaseContext.Provider>;
 };
 
-export { DatabaseProvider, useDatabase, getSessionCredentials, getAuthToken };
+export {
+  DatabaseProvider,
+  useDatabase,
+  getSessionCredentials,
+  getAuthToken,
+  SaveThemeSettings,
+  LogoutUser,
+};

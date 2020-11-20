@@ -1,11 +1,8 @@
 import React, { useContext, useState, useEffect } from "react";
-import DeviceInfo from "react-native-device-info";
-import AsyncStorage from "@react-native-async-storage/async-storage";
 import { ThemeContext } from "../../App";
 import { useTheme } from "@react-navigation/native";
-import { useDatabase } from "../config/Persistence";
+import { useDatabase, SaveThemeSettings, LogoutUser } from "../config/Persistence";
 import { useAuthorization } from "../navigation/Authorizer";
-import { logoutFromShop } from "../api/ApiService";
 import { DrawerContentScrollView, DrawerItem } from "@react-navigation/drawer";
 import { SafeAreaView, StyleSheet, View, Alert, Text } from "react-native";
 import { Drawer, Divider } from "react-native-paper";
@@ -51,15 +48,6 @@ export function CustomDrawerContent(props) {
     }
   }
 
-  async function SaveThemeSettings() {
-    try {
-      console.log("saving in storage: DarkTheme", isDarkTheme);
-      await AsyncStorage.setItem("@app_theme_isDark", JSON.stringify(isDarkTheme));
-    } catch (error) {
-      console.log("failed to save theme", error);
-    }
-  }
-
   function ConfirmSignOut() {
     Alert.alert("Log Out", "Are you sure you wish to Log Out from the app?", [
       { text: "Cancel", style: "cancel" },
@@ -69,43 +57,19 @@ export function CustomDrawerContent(props) {
         onPress: () => {
           props.navigation.closeDrawer();
           //TODO Show some kind of Splash/Overlay while waiting for Api response + clearing credential data
-          LogoutUser();
+          LogoutUser(shop.id)
+            .then((success) => {
+              if (success) {
+                setAuthorization(false);
+              }
+            })
+            .catch((error) => {
+              console.log("[DRAWER] Failed to Logout", error);
+            });
           console.log("logging out");
         },
       },
     ]);
-  }
-
-  async function LogoutUser() {
-    //TODO Call signout api
-    await logoutFromShop(shop.id, DeviceInfo.getUniqueId())
-      .then((status) => {
-        console.log("logged out?", status);
-        ClearUserSession();
-      })
-      .catch((error) => {
-        console.log("Couldn't sign out", error);
-        return;
-      });
-    await setAuthorization(false);
-  }
-
-  async function ClearUserSession() {
-    const keys = ["@auth_session", "@auth_token"];
-    //TODO Clear Shop Data from Realm DB
-    try {
-      let shop = await realm.objects("Shop");
-      await realm.delete(shop);
-    } catch (error) {
-      console.log("failed to clear objects", error);
-      return;
-    }
-    //TODO Clear Session and token from AsyncStorage
-    try {
-      await AsyncStorage.multiRemove(keys);
-    } catch (error) {
-      console.log("failed to remove from local", error);
-    }
   }
 
   return (
