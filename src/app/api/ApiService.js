@@ -100,6 +100,60 @@ async function getProductsFromShop(shopId) {
   }
 }
 
+async function getCustomersForShop(shopId) {
+  var token = await getAuthToken();
+  try {
+    return new Promise(async function (resolve, reject) {
+      const response = await service.get(`${GET_CUSTOMERS}/${shopId}`, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      if (response.data.status) {
+        resolve(response.data.data);
+      } else {
+        reject(response.data.message);
+      }
+    });
+  } catch (error) {
+    console.log("request error", error.message);
+  }
+}
+
+async function addCustomerToShop(customer) {
+  var token = await getAuthToken();
+  try {
+    return new Promise(async function (resolve, reject) {
+      const response = await service.post(POST_CUSTOMERS, customer, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      if (response.data.status) {
+        resolve(response.data.data);
+      } else {
+        reject(response.data.message);
+      }
+    });
+  } catch (error) {
+    console.log("request error", error.message);
+  }
+}
+
+async function generateOrder(order) {
+  var token = await getAuthToken();
+  try {
+    return new Promise(async function (resolve, reject) {
+      const response = await service.post(POST_ORDER, order, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      if (response.data.status) {
+        resolve(response.data.data);
+      } else {
+        reject(response.data.message);
+      }
+    });
+  } catch (error) {
+    console.log("request error", error.message);
+  }
+}
+
 async function getCatalogueLinks(shopId) {
   var token = await getAuthToken();
   try {
@@ -232,6 +286,9 @@ export {
   generateLoginOTP,
   loginToShop,
   getProductsFromShop,
+  getCustomersForShop,
+  addCustomerToShop,
+  generateOrder,
   getCatalogueLinks,
   generateCatalogueLink,
   regenerateLinkOtp,
