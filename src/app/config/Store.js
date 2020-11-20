@@ -4,6 +4,7 @@ import combineReducers from "react-combine-reducers";
 import { initialIndicators, indicatorReducer } from "../reducers/Indicators";
 import { initialData, dataReducer } from "../reducers/Data";
 import { initialQuery, queryReducer } from "../reducers/Query";
+import { initialShop, shopReducer } from "../reducers/Shop";
 
 const StoreContext = createContext();
 const useStore = () => useContext(StoreContext);
@@ -15,6 +16,7 @@ const StoreProvider = ({ children }) => {
       indicators: [indicatorReducer, initialIndicators],
       data: [dataReducer, initialData],
       filters: [queryReducer, initialQuery],
+      shop: [shopReducer, initialShop],
     }),
     [reducer, appState]
   );
