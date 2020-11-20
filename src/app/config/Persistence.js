@@ -75,12 +75,12 @@ async function ClearUserSession() {
   const keys = ["@auth_session", "@auth_token"];
   //TODO Clear Shop Data from Realm DB
   try {
-    realm.write(() => {
-      let shop = await realm.objects("Shop");
-      await realm.delete(shop);
-      let cart = await realm.objects("Cart");
-      await realm.delete(cart);
-    })
+    await realm.write(() => {
+      let shop = realm.objects("Shop");
+      realm.delete(shop);
+      let cart = realm.objects("Cart");
+      realm.delete(cart);
+    });
   } catch (error) {
     console.log("failed to clear objects", error);
     return;
