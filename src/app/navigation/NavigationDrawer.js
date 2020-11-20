@@ -12,7 +12,7 @@ const NavigationDrawer = () => (
   <Drawer.Navigator drawerContent={(props) => <CustomDrawerContent {...props} />}>
     <Drawer.Screen name="Home" component={HomeStacks} options={{ headerShown: false }} />
     <Drawer.Screen name="Cart" component={CartStacks} />
-    <Drawer.Screen name="Links" component={CatalogueLinks} />
+    <Drawer.Screen name="Links" component={CatalogueLinks} options={{ headerShown: false }} />
   </Drawer.Navigator>
 );
 

@@ -6345,6 +6345,11 @@ react-is@^17.0.1:
   resolved "https://registry.yarnpkg.com/react-is/-/react-is-17.0.1.tgz#5b3531bd76a645a4c9fb6e693ed36419e3301339"
   integrity sha512-NAnt2iGDXohE5LI7uBnLnqvLQMtzhkiAOLXTmv+qnF9Ky7xAPcX8Up/xWIhxvLVGJvuLiNc4xQLtuqDRzb4fSA==
 
+react-native-animated-spinkit@^1.4.2:
+  version "1.4.2"
+  resolved "https://registry.yarnpkg.com/react-native-animated-spinkit/-/react-native-animated-spinkit-1.4.2.tgz#cb60ff8bcc2bb848409d9aa85ed528646ad1f953"
+  integrity sha512-CLFkynkqRueQK/XUknleiYQr3T0E8cY0KbuaV78JGiHhnF12C3k0ngDAOk6FHssZn3JXnTOVkJsrIBOYkttRmA==
+
 react-native-device-detection@^0.2.1:
   version "0.2.1"
   resolved "https://registry.yarnpkg.com/react-native-device-detection/-/react-native-device-detection-0.2.1.tgz#6b50bf7bf9137a395f9dfd0f2b1d01aeee170a49"

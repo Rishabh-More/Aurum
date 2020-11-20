@@ -100,6 +100,100 @@ async function getProductsFromShop(shopId) {
   }
 }
 
+async function getCatalogueLinks(shopId) {
+  var token = await getAuthToken();
+  try {
+    return new Promise(async function (resolve, reject) {
+      const response = await service.get(`${GET_CATALOGUE_LINKS}/${shopId}`, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      if (response.data.status) {
+        resolve(response.data.data);
+      } else {
+        reject(response.data.message);
+      }
+    });
+  } catch (error) {
+    console.log("request error", error.message);
+  }
+}
+
+async function generateCatalogueLink(link) {
+  var token = await getAuthToken();
+  try {
+    return new Promise(async function (resolve, reject) {
+      const response = await service.post(GENERATE_LINK, link, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      if (response.data.status) {
+        resolve(response.data.data);
+      } else {
+        reject(response.data.message);
+      }
+    });
+  } catch (error) {
+    console.log("request error", error.message);
+  }
+}
+
+async function regenerateLinkOtp(link) {
+  var token = await getAuthToken();
+  try {
+    return new Promise(async function (resolve, reject) {
+      const response = await service.post(REGENERATE_OTP, link, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      if (response.data.status) {
+        resolve(response.data.data);
+      } else {
+        reject(response.data.message);
+      }
+    });
+  } catch (error) {
+    console.log("request error", error.message);
+  }
+}
+
+async function expireCatalogueLink(linkId) {
+  var token = await getAuthToken();
+  try {
+    return new Promise(async function (resolve, reject) {
+      const response = await service.delete(`${DELETE_LINK}/${linkId}`, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      if (response.data.status) {
+        resolve(response.data.status);
+      } else {
+        reject(response.data.message);
+      }
+    });
+  } catch (error) {
+    console.log("request error", error.message);
+  }
+}
+
+async function shortShareableLink(link) {
+  var token = await getAuthToken();
+  try {
+    return new Promise(async function (resolve, reject) {
+      const response = await service.post(
+        SHORT_LINK,
+        { Url: link },
+        {
+          headers: { Authorization: `Bearer ${token}` },
+        }
+      );
+      if (response.data.status) {
+        resolve(response.data.data);
+      } else {
+        reject(response.data.message);
+      }
+    });
+  } catch (error) {
+    console.log("request error", error.message);
+  }
+}
+
 async function logoutFromShop(shopId, deviceId) {
   var token = await getAuthToken();
   try {
@@ -133,4 +227,15 @@ function TestSampleApi() {
   }
 }
 
-export { TestSampleApi, generateLoginOTP, loginToShop, getProductsFromShop, logoutFromShop };
+export {
+  TestSampleApi,
+  generateLoginOTP,
+  loginToShop,
+  getProductsFromShop,
+  getCatalogueLinks,
+  generateCatalogueLink,
+  regenerateLinkOtp,
+  expireCatalogueLink,
+  shortShareableLink,
+  logoutFromShop,
+};
