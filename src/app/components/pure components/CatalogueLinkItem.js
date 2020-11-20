@@ -157,7 +157,7 @@ const CatalogueLinkItem = ({ link, columns }) => {
                 </Text>
                 <Button
                   loading={generating}
-                  buttonStyle={{ backgroundColor: colors.accent }}
+                  buttonStyle={{ backgroundColor: colors.accent, borderRadius: 10 }}
                   containerStyle={{ width: isPhone ? 125 : 150, margin: 5, borderRadius: 10 }}
                   title="Regenerate OTP"
                   onPress={() => generateNewOtp()}

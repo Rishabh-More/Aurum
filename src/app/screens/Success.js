@@ -1,18 +1,12 @@
-import React, { useState, useEffect } from "react";
-import { SafeAreaView, View, Text, StyleSheet, ScrollView } from "react-native";
+import React from "react";
+import OrderSuccess from "../components/OrderSuccess";
+import LinkSuccess from "../components/LinkSuccess";
 
-export default function Success() {
-  return (
-    <SafeAreaView style={styles.container}>
-      <Text>This is Success Screen</Text>
-    </SafeAreaView>
+export default function Success({ route }) {
+  console.log("sucess props received", route.params);
+  return route.params.feature == "order" ? (
+    <OrderSuccess success={route.params.data} />
+  ) : (
+    <LinkSuccess success={route.params.data} />
   );
 }
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    justifyContent: "center",
-    alignItems: "center",
-  },
-});
