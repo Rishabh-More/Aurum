@@ -8,6 +8,7 @@ import { getCustomersForShop, addCustomerToShop, generateOrder } from "../api/Ap
 import { SafeAreaView, View, Text, StyleSheet, ScrollView } from "react-native";
 import { Card, Title, TextInput, HelperText, Divider } from "react-native-paper";
 import MultiSelect from "react-native-multiple-select";
+import Icon from "react-native-vector-icons/MaterialCommunityIcons";
 import { Button } from "react-native-elements";
 import { Fold } from "react-native-animated-spinkit";
 import Toast from "react-native-simple-toast";
@@ -85,6 +86,23 @@ export default function Customers() {
       ExportOrder();
     }
   }, [isReady]);
+
+  async function ClearSelectedCustomer() {
+    await setSelected({
+      id: 0,
+      isPrimary: 1,
+      shopId: state.shop.id,
+      name: "",
+      email: "",
+      phone: "",
+      addressLine1: "",
+      addressLine2: "",
+      city: "",
+      state: "",
+      country: "",
+      pincode: "",
+    });
+  }
 
   async function ValidateCustomer() {
     var pattern = /^[a-zA-Z0-9\-_]+(\.[a-zA-Z0-9\-_]+)*@[a-z0-9]+(\-[a-z0-9]+)*(\.[a-z0-9]+(\-[a-z0-9]+)*)*\.[a-z]{2,4}$/;
@@ -201,47 +219,64 @@ export default function Customers() {
             <Text style={{ color: colors.text }}>Please Wait, getting your Customers</Text>
           </View>
         ) : null}
-        <MultiSelect
-          single={true}
-          items={picker}
-          uniqueKey="id"
-          hideTags={false}
-          fixedHeight={true}
-          selectText={selected.name != "" ? selected.name : "Select Customer"}
-          selectedItems={[selected]}
-          styleMainWrapper={styles.selectMainWrapper}
-          styleDropdownMenu={styles.selectDropdownMenu}
-          styleDropdownMenuSubsection={[
-            styles.selectDropdownMenuSubSection,
-            { backgroundColor: colors.primary, borderColor: colors.border },
-          ]}
-          styleTextDropdownSelected={[
-            styles.selectTextDropdownSelected,
-            { color: selected.name != "" ? colors.accent : colors.text },
-          ]}
-          styleInputGroup={[styles.selectInputGroup, { backgroundColor: colors.primary }]}
-          styleSelectorContainer={[
-            styles.selectSelectorContainer,
-            { backgroundColor: colors.primary, borderColor: colors.primary },
-          ]}
-          styleListContainer={{ backgroundColor: colors.primary }}
-          styleRowList={{ backgroundColor: colors.primary }}
-          itemTextColor={colors.textSubtle}
-          submitButtonColor={colors.accentDark}
-          onSelectedItemsChange={(value) => {
-            let picked = customers.find((item) => item.id == parseInt(value));
-            console.log("picked customer object", picked);
-            setSelected({
-              ...selected,
-              id: parseInt(picked.id),
-              name: picked.name,
-              email: picked.email,
-              phone: picked.phone,
-              addressLine1: picked.addressLine1,
-              shopId: picked.shopId,
-            });
-          }}
-        />
+        <View style={{ flexDirection: "row", alignItems: "center" }}>
+          <MultiSelect
+            single={true}
+            items={picker}
+            uniqueKey="id"
+            hideTags={false}
+            fixedHeight={true}
+            selectText={selected.name != "" ? selected.name : "Select Customer"}
+            selectedItems={[selected]}
+            styleMainWrapper={styles.selectMainWrapper}
+            styleDropdownMenu={styles.selectDropdownMenu}
+            styleDropdownMenuSubsection={[
+              styles.selectDropdownMenuSubSection,
+              { backgroundColor: colors.primary, borderColor: colors.border },
+            ]}
+            styleTextDropdownSelected={[
+              styles.selectTextDropdownSelected,
+              { color: selected.name != "" ? colors.accent : colors.text },
+            ]}
+            styleInputGroup={[styles.selectInputGroup, { backgroundColor: colors.primary }]}
+            styleSelectorContainer={[
+              styles.selectSelectorContainer,
+              { backgroundColor: colors.primary, borderColor: colors.primary },
+            ]}
+            styleListContainer={{ backgroundColor: colors.primary }}
+            styleRowList={{ backgroundColor: colors.primary }}
+            itemTextColor={colors.textSubtle}
+            submitButtonColor={colors.accentDark}
+            onSelectedItemsChange={(value) => {
+              let picked = customers.find((item) => item.id == parseInt(value));
+              console.log("picked customer object", picked);
+              setSelected({
+                ...selected,
+                id: parseInt(picked.id),
+                name: picked.name,
+                email: picked.email,
+                phone: picked.phone,
+                addressLine1: picked.addressLine1,
+                shopId: picked.shopId,
+              });
+            }}
+          />
+          <Button
+            type="outline"
+            icon={
+              <Icon
+                name="close"
+                size={30}
+                color={
+                  selected.name === "" && selected.email === "" ? colors.border : colors.accentDark
+                }
+              />
+            }
+            buttonStyle={{ marginEnd: 10, borderRadius: 10, borderColor: colors.accentDark }}
+            disabled={selected.name === "" && selected.email === "" ? true : false}
+            onPress={() => ClearSelectedCustomer()}
+          />
+        </View>
       </View>
     );
   }
@@ -436,6 +471,7 @@ const styles = StyleSheet.create({
     marginEnd: 10,
   },
   selectMainWrapper: {
+    flex: 1,
     margin: 5,
     marginTop: 10,
     marginBottom: 10,

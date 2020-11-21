@@ -178,8 +178,6 @@ const CartOrderItem = ({ cart }) => {
                       { name: "PG", id: "PG" },
                       { name: "YW", id: "YW" },
                       { name: "PW", id: "PW" },
-                      { name: "GW", id: "GW" },
-                      { name: "PA", id: "PA" },
                     ],
                   },
                 ]}

@@ -103,7 +103,7 @@ const SingleCatalogueItem = ({ product, columns }) => {
                 {product.grossWeight}
               </Text>
               <Text style={[styles.text, { flex: 1, color: colors.textSubtle }]}>
-                <Text style={{ fontWeight: "bold" }}>{product.metalPurity} Kt</Text>
+                <Text style={{ fontWeight: "bold" }}>{product.metalPurity}</Text>
               </Text>
             </View>
             <View
