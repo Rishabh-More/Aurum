@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from "react";
+import { useStore } from "../config/Store";
 import { useTheme, useNavigation } from "@react-navigation/native";
 import { useAuthorization } from "./../navigation/Authorizer";
 import { useDatabase } from "../config/Persistence";
@@ -9,6 +10,7 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 import LinearGradient from "react-native-linear-gradient";
 import OTPTextView from "react-native-otp-textinput";
 import Toast from "react-native-simple-toast";
+import { DropDownHolder } from "../config/DropDownHolder";
 
 export default function Verification({ route }) {
   const login = route.params;
@@ -20,6 +22,7 @@ export default function Verification({ route }) {
   console.log("login body", route.params);
 
   //State Code
+  const { state, dispatch } = useStore();
   const [otp, setOtp] = useState("");
 
   useEffect(
@@ -64,7 +67,7 @@ export default function Verification({ route }) {
         })
         .catch((error) => {
           console.log("failed to validate otp", error);
-          Toast.show("Invalid OTP. Please enter a valid otp");
+          DropDownHolder.alert("error", "Failed to Verify OTP", error);
           setloading(false);
           return;
         });
@@ -75,6 +78,7 @@ export default function Verification({ route }) {
     //TODO Save
     //1. data.shop (Shop Data)
     try {
+      await dispatch({ type: "UPDATE_SHOP_DETAILS", payload: data.shop });
       await realm.write(() => {
         realm.create("Shop", data.shop);
       });

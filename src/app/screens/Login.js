@@ -17,6 +17,7 @@ import { LoginHeader } from "../components/LoginHeader";
 import { LoginFooter } from "../components/LoginFooter";
 import { LoginContent } from "../components/LoginContent";
 import Toast from "react-native-simple-toast";
+import { DropDownHolder } from "../config/DropDownHolder";
 //TODO For Now, just use uniqueId for Login Api
 export default function Login() {
   //Configs
@@ -161,16 +162,17 @@ export default function Login() {
         .then((data) => {
           console.log("login success?", data);
           Toast.show("An OTP has been sent to your Registered Email Id", Toast.LONG);
+          navigation.navigate("verify", login);
           setLoading(false);
           setReady(false);
         })
         .catch((error) => {
           console.log("login error", error);
+          DropDownHolder.alert("error", "Failed to Login", error);
           setLoading(false);
           setReady(false);
           return;
         });
-      navigation.navigate("verify", login);
     } else {
       console.log("still not ready");
     }

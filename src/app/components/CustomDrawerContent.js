@@ -94,10 +94,10 @@ export function CustomDrawerContent(props) {
               label={() => <Text style={{ color: colors.text }}>Catalogue Links</Text>}
               onPress={() => props.navigation.navigate("Links")}
             />
-            <DrawerItem
+            {/* <DrawerItem
               icon={({ size }) => <Icon name="account-outline" color={colors.accent} size={size} />}
               label={() => <Text style={{ color: colors.text }}>About Us</Text>}
-            />
+            /> */}
           </Drawer.Section>
           <Drawer.Section title="Theme">
             <View style={drawer.preferences}>

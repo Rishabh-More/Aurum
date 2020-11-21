@@ -2,6 +2,7 @@ import React, { createContext, useContext } from "react";
 import DeviceInfo from "react-native-device-info";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { ShopSchema, CompanySchema, AddressSchema, CartSchema } from "../config/Schemas";
+import { DropDownHolder } from "./DropDownHolder";
 import { logoutFromShop } from "../api/ApiService";
 //import { Realm } from "realm";
 const Realm = require("realm");
@@ -18,8 +19,10 @@ async function SaveThemeSettings() {
   try {
     console.log("saving in storage: DarkTheme", isDarkTheme);
     await AsyncStorage.setItem("@app_theme_isDark", JSON.stringify(isDarkTheme));
+    DropDownHolder.alert("success", "Theme to Async Storage.");
   } catch (error) {
     console.log("failed to save theme", error);
+    //DropDownHolder.alert("warn", "Failed to save Theme", error);
   }
 }
 

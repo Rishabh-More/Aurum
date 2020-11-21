@@ -1,5 +1,6 @@
 import "react-native-gesture-handler";
 import React, { createContext, useEffect, useState } from "react";
+import DropdownAlert from "react-native-dropdownalert";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { StoreProvider } from "./app/config/Store";
 import { DatabaseProvider } from "./app/config/Persistence";
@@ -7,6 +8,7 @@ import { Provider as PaperProvider } from "react-native-paper";
 import { AppDefaultTheme, AppDarkTheme } from "./app/res/Themes";
 import { NavigationContainer } from "@react-navigation/native";
 import { Authorizer } from "./app/navigation/Authorizer";
+import { DropDownHolder } from "./app/config/DropDownHolder";
 
 export const ThemeContext = createContext();
 
@@ -42,6 +44,7 @@ export default function App() {
             <NavigationContainer theme={theme}>
               <Authorizer />
             </NavigationContainer>
+            <DropdownAlert ref={(ref) => DropDownHolder.setDropDown(ref)} closeInterval={5000} />
           </ThemeContext.Provider>
         </StoreProvider>
       </DatabaseProvider>
