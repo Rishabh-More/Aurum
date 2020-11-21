@@ -170,7 +170,7 @@ export default function ProductDetails({ route }) {
                   justifyContent: isTablet ? "space-evenly" : "flex-start",
                 }}>
                 <Wrapper style={{ margin: 10 }}>
-                  <Info title="Purity:" value={product.metalPurity + " Kt"} />
+                  <Info title="Purity:" value={product.metalPurity} />
                   <Info title="Category:" value={product.itemCategory} />
                 </Wrapper>
                 <Wrapper style={{ margin: 10 }}>
