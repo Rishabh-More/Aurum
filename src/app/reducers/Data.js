@@ -25,29 +25,21 @@ const dataReducer = (state, action) => {
     case "ADD_TO_CART":
       return { ...state, cart: [...state.cart, action.payload] };
     case "ADD_ALL_TO_CART":
-      let newCart = [...state.cart];
-      console.log({ beforeAdding: newCart }, action.payload);
-      //newCart = [...newCart, ...action.payload];
-      newCart = newCart.concat([...action.payload]);
-      console.log({ afterAdding: newCart });
-      //console.log("data reducer", action.payload, newCart);
-      return { ...state, cart: newCart };
+      return { ...state, cart: state.cart.concat(action.payload) };
     case "UPDATE_CART_ITEM":
-      const indexCart = state.cart.map((item) => item.skuNumber).indexOf(action.payload.skuNumber);
-      return {
-        ...state,
-        cart: [
-          ...state.cart.slice(0, indexCart),
-          {
-            ...state.cart[indexCart],
-            metalPurity: action.payload.metalPurity,
-            metalType: action.payload.metalType,
-            orderProductQuantity: action.payload.orderProductQuantity,
-            orderProductRemarks: action.payload.orderProductRemarks,
-          },
-          ...state.cart.slice(indexCart + 1),
-        ],
-      };
+      //const indexCart = state.cart.map((item) => item.skuNumber).indexOf(action.payload.skuNumber);
+      // console.log("[DATA REDUCER] cart before updating", state.cart);
+      // console.log("[DATA REDUCER] cart item at index", state.cart[indexCart]);
+      // console.log("[DATA REDUCER]before slicing", state.cart.slice(0, indexCart));
+      // console.log("[DATA RECUDER] updated cart item", {
+      //   ...state.cart[indexCart],
+      //   metalPurity: action.payload.metalPurity,
+      //   metalType: action.payload.metalType,
+      //   orderProductQuantity: action.payload.orderProductQuantity,
+      //   orderProductRemarks: action.payload.orderProductRemarks,
+      // });
+      // console.log("[DATA REDUCER] after slicing", state.cart.slice(indexCart + 1));
+      return { ...state, cart: action.payload };
     case "DELETE_FROM_CART":
       return {
         ...state,

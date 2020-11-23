@@ -95,12 +95,11 @@ export default function Catalogue() {
     try {
       let cart = await realm.objects("Cart");
       if (cart.length != 0 && state.data.cart.length === 0) {
-        dispatch({ type: "ADD_ALL_TO_CART", payload: cart });
         //There are saved cart items, push these to Store immediately
-        // cart.forEach((item) => {
-        //   console.log("cart item?", item);
-        //   dispatch({ type: "ADD_ALL_TO_CART", payload: item });
-        // });
+        cart.forEach((item) => {
+          console.log("cart item?", item);
+          dispatch({ type: "ADD_ALL_TO_CART", payload: item });
+        });
       }
     } catch (error) {
       console.log("failed to read stored cart", error);

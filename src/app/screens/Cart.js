@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useEffect } from "react";
 import { useStore } from "../config/Store";
 import { useDatabase } from "../config/Persistence";
 import { useTheme, useNavigation } from "@react-navigation/native";
