@@ -28,6 +28,10 @@ export default function Cart() {
     RequestFeature();
   }, []);
 
+  useEffect(() => {
+    console.log("[CART] Cart updated in store", state.data.cart);
+  }, [state.data.cart]);
+
   async function ClearCartItems() {
     try {
       await realm.write(() => {
@@ -79,6 +83,7 @@ export default function Cart() {
           numColumns={isPhone ? phoneColumns : tabColumns}
           style={styles.flatlist}
           data={state.data.cart}
+          //extraData={state.data.cart}
           keyExtractor={(item) => item.skuNumber}
           renderItem={({ item }) => <CartOrderItem cart={item} />}
           contentContainerStyle={

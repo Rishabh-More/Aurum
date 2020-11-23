@@ -25,7 +25,13 @@ const dataReducer = (state, action) => {
     case "ADD_TO_CART":
       return { ...state, cart: [...state.cart, action.payload] };
     case "ADD_ALL_TO_CART":
-      return { ...state, cart: state.cart.concat(action.payload) };
+      let newCart = [...state.cart];
+      console.log({ beforeAdding: newCart }, action.payload);
+      //newCart = [...newCart, ...action.payload];
+      newCart = newCart.concat([...action.payload]);
+      console.log({ afterAdding: newCart });
+      //console.log("data reducer", action.payload, newCart);
+      return { ...state, cart: newCart };
     case "UPDATE_CART_ITEM":
       const indexCart = state.cart.map((item) => item.skuNumber).indexOf(action.payload.skuNumber);
       return {

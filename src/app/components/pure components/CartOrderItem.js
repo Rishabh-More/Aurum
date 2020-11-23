@@ -21,16 +21,71 @@ const CartOrderItem = ({ cart }) => {
   //State Codes
   const { state, dispatch } = useStore();
   const [updated, setUpdated] = useState(false);
-  const [props, setProps] = useState({
-    skuNumber: cart.skuNumber,
-    metalPurity: cart.metalPurity,
-    metalType: cart.metalType,
-    orderProductRemarks: cart.orderProductRemarks,
-    orderProductQuantity: 1,
-  });
-  const prevObject = usePrevious(props);
-  console.log("initial props object", props);
-  console.log("previous object", prevObject);
+  // const [props, setProps] = useState({
+  //   skuNumber: cart.skuNumber,
+  //   metalPurity: cart.metalPurity,
+  //   metalType: cart.metalType,
+  //   orderProductRemarks: cart.orderProductRemarks,
+  //   orderProductQuantity: 1,
+  // });
+  //const prevObject = usePrevious(props);
+  //let props = cart;
+  let props = Object.assign({}, cart);
+  console.log({ props });
+  const setProps = async (newCart) => {
+    console.log("[CART ITEM]", props);
+    console.log("[NEW CART ITEM]", newCart);
+    const newCartValue = { ...props, ...newCart };
+    console.log("[NEW CART VALUE]", newCartValue);
+    // try {
+    //   await realm.write(() => {
+    //     realm.create(
+    //       "Cart",
+    //       {
+    //         id: cart.id,
+    //         metalPurity: newCart.metalPurity,
+    //         metalType: newCart.metalType,
+    //         orderProductQuantity: newCart.orderProductQuantity,
+    //         orderProductRemarks: newCart.orderProductRemarks,
+    //       },
+    //       "modified"
+    //     );
+    //   });
+    //   await dispatch({ type: "UPDATE_CART_ITEM", payload: newCart });
+    // } catch (error) {
+    //   console.log("failed to update cart item", error);
+    // }
+  };
+  //console.log("initial props object", props);
+  //console.log("previous object", prevObject);
+
+  // useEffect(() => {
+  //   if (prevObject != null) {
+  //     UpdateCartItem();
+  //   }
+  // }, [props]);
+
+  async function UpdateCartItem() {
+    console.log("props updated", props);
+    try {
+      await realm.write(() => {
+        realm.create(
+          "Cart",
+          {
+            id: cart.id,
+            metalPurity: props.metalPurity,
+            metalType: props.metalType,
+            orderProductQuantity: props.orderProductQuantity,
+            orderProductRemarks: props.orderProductRemarks,
+          },
+          "modified"
+        );
+      });
+      //await dispatch({ type: "UPDATE_CART_ITEM", payload: props });
+    } catch (error) {
+      console.log("failed to update cart item", error);
+    }
+  }
 
   async function removeFromCart() {
     try {
@@ -141,6 +196,7 @@ const CartOrderItem = ({ cart }) => {
                   modalWrapper: { justifyContent: "center" },
                 }}
                 onSelectedItemsChange={(value) => {
+                  console.log("[ONCHANGE PROPS]", props);
                   setProps({ ...props, metalPurity: value[0] });
                   if (updated) setUpdated(false);
                 }}
@@ -216,7 +272,7 @@ const CartOrderItem = ({ cart }) => {
                 if (updated) setUpdated(false);
               }}
             />
-            <Button
+            {/* <Button
               type="outline"
               icon={
                 <MaterialCommunityIcons name="trash-can-outline" size={28} color={colors.accent} />
@@ -229,7 +285,7 @@ const CartOrderItem = ({ cart }) => {
                 borderWidth: 0.5,
               }}
               onPress={() => removeFromCart()}
-            />
+            /> */}
           </View>
           {state.indicators.requestedFeature == "order" ? (
             <View
@@ -262,6 +318,24 @@ const CartOrderItem = ({ cart }) => {
                 }}
               />
               <Button
+                type="outline"
+                icon={
+                  <MaterialCommunityIcons
+                    name="trash-can-outline"
+                    size={28}
+                    color={colors.accent}
+                  />
+                }
+                buttonStyle={{
+                  margin: 5,
+                  alignSelf: "flex-end",
+                  borderColor: colors.accent,
+                  borderRadius: 10,
+                  borderWidth: 0.5,
+                }}
+                onPress={() => removeFromCart()}
+              />
+              {/* <Button
                 title="Save"
                 disabled={props === prevObject || prevObject == null ? true : false}
                 disabledStyle={{ backgroundColor: colors.disabled }}
@@ -294,7 +368,7 @@ const CartOrderItem = ({ cart }) => {
                   await dispatch({ type: "UPDATE_CART_ITEM", payload: props });
                   Toast.show(`Item Updated: ${cart.skuNumber}`);
                 }}
-              />
+              /> */}
             </View>
           ) : null}
         </View>
