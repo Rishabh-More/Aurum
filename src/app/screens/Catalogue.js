@@ -54,7 +54,7 @@ export default function Catalogue() {
   }, [state.data.products]);
 
   useEffect(() => {
-    console.log("cart updated", state.data.cart);
+    //console.log("cart updated", state.data.cart);
   }, [state.data.cart]);
 
   useEffect(() => {
@@ -96,9 +96,9 @@ export default function Catalogue() {
       let cart = await realm.objects("Cart");
       if (cart.length != 0 && state.data.cart.length === 0) {
         //There are saved cart items, push these to Store immediately
-        cart.forEach((cart) => {
-          console.log("cart item?", cart);
-          dispatch({ type: "ADD_ALL_TO_CART", payload: cart });
+        cart.forEach((item) => {
+          console.log("cart item?", item);
+          dispatch({ type: "ADD_ALL_TO_CART", payload: item });
         });
       }
     } catch (error) {

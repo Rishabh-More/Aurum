@@ -3,7 +3,7 @@ import { useStore } from "../../config/Store";
 import { useDatabase } from "../../config/Persistence";
 import { useTheme } from "@react-navigation/native";
 import { usePrevious } from "../../hooks/usePrevious";
-import { isPhone, isTablet } from "react-native-device-detection";
+import { isPhone } from "react-native-device-detection";
 import { View, Text, StyleSheet } from "react-native";
 import { Card, Title, TextInput } from "react-native-paper";
 import { Button } from "react-native-elements";
@@ -29,8 +29,37 @@ const CartOrderItem = ({ cart }) => {
     orderProductQuantity: 1,
   });
   const prevObject = usePrevious(props);
-  console.log("initial props object", props);
-  console.log("previous object", prevObject);
+
+  useEffect(() => {
+    if (prevObject != null) {
+      console.log("Cart Update function called");
+      UpdateCartItem();
+      console.log("Cart Updated");
+    }
+    console.log("useEffect ran");
+  }, [props]);
+
+  async function UpdateCartItem() {
+    try {
+      await realm.write(() => {
+        realm.create(
+          "Cart",
+          {
+            id: cart.id,
+            metalPurity: props.metalPurity,
+            metalType: props.metalType,
+            orderProductQuantity: props.orderProductQuantity,
+            orderProductRemarks: props.orderProductRemarks,
+          },
+          "modified"
+        );
+      });
+      let realmCart = await realm.objects("Cart");
+      await dispatch({ type: "UPDATE_CART_ITEM", payload: realmCart });
+    } catch (error) {
+      console.log("failed to update cart item", error);
+    }
+  }
 
   async function removeFromCart() {
     try {
@@ -141,6 +170,7 @@ const CartOrderItem = ({ cart }) => {
                   modalWrapper: { justifyContent: "center" },
                 }}
                 onSelectedItemsChange={(value) => {
+                  console.log("[ONCHANGE PROPS]", props);
                   setProps({ ...props, metalPurity: value[0] });
                   if (updated) setUpdated(false);
                 }}
@@ -216,20 +246,6 @@ const CartOrderItem = ({ cart }) => {
                 if (updated) setUpdated(false);
               }}
             />
-            <Button
-              type="outline"
-              icon={
-                <MaterialCommunityIcons name="trash-can-outline" size={28} color={colors.accent} />
-              }
-              buttonStyle={{
-                margin: 5,
-                alignSelf: "flex-end",
-                borderColor: colors.accent,
-                borderRadius: 10,
-                borderWidth: 0.5,
-              }}
-              onPress={() => removeFromCart()}
-            />
           </View>
           {state.indicators.requestedFeature == "order" ? (
             <View
@@ -262,38 +278,22 @@ const CartOrderItem = ({ cart }) => {
                 }}
               />
               <Button
-                title="Save"
-                disabled={props === prevObject || prevObject == null ? true : false}
-                disabledStyle={{ backgroundColor: colors.disabled }}
-                containerStyle={{ flex: 1 }}
-                buttonStyle={{ backgroundColor: colors.accent, borderRadius: 10 }}
-                onPress={async () => {
-                  console.log("dispatched to store");
-                  //Step 1: If updated is false, make it true
-                  //Because we have just updated the item
-                  if (!updated) setUpdated(true);
-                  //Step 2: Dispatch the object to store
-                  try {
-                    await realm.write(() => {
-                      realm.create(
-                        "Cart",
-                        {
-                          id: cart.id,
-                          metalPurity: props.metalPurity,
-                          metalType: props.metalType,
-                          orderProductQuantity: props.orderProductQuantity,
-                          orderProductRemarks: props.orderProductRemarks,
-                        },
-                        "modified"
-                      );
-                    });
-                    await dispatch({ type: "UPDATE_CART_ITEM", payload: props });
-                  } catch (error) {
-                    console.log("failed to update cart item", error);
-                  }
-                  await dispatch({ type: "UPDATE_CART_ITEM", payload: props });
-                  Toast.show(`Item Updated: ${cart.skuNumber}`);
+                type="outline"
+                icon={
+                  <MaterialCommunityIcons
+                    name="trash-can-outline"
+                    size={24}
+                    color={colors.accent}
+                  />
+                }
+                buttonStyle={{
+                  margin: 5,
+                  alignSelf: "flex-end",
+                  borderColor: colors.accent,
+                  borderRadius: 10,
+                  borderWidth: 0.5,
                 }}
+                onPress={() => removeFromCart()}
               />
             </View>
           ) : null}

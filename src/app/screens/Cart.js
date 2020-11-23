@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useEffect } from "react";
 import { useStore } from "../config/Store";
 import { useDatabase } from "../config/Persistence";
 import { useTheme, useNavigation } from "@react-navigation/native";
@@ -27,6 +27,10 @@ export default function Cart() {
     //If No feature has been selected, ask user for feature
     RequestFeature();
   }, []);
+
+  useEffect(() => {
+    console.log("[CART] Cart updated in store", state.data.cart);
+  }, [state.data.cart]);
 
   async function ClearCartItems() {
     try {
@@ -79,6 +83,7 @@ export default function Cart() {
           numColumns={isPhone ? phoneColumns : tabColumns}
           style={styles.flatlist}
           data={state.data.cart}
+          //extraData={state.data.cart}
           keyExtractor={(item) => item.skuNumber}
           renderItem={({ item }) => <CartOrderItem cart={item} />}
           contentContainerStyle={
