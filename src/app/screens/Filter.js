@@ -1,8 +1,9 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { useStore } from "../config/Store";
 import { useDimensions } from "@react-native-community/hooks";
 import { useTheme, useNavigation } from "@react-navigation/native";
 import { useDataFilter } from "../hooks/useDataFilter";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 import { SafeAreaView, View, Text, StyleSheet, ScrollView } from "react-native";
 import { Card, Divider, Title } from "react-native-paper";
 import { Button } from "react-native-elements";
@@ -19,6 +20,62 @@ export default function Filter() {
   const { query, updateQuery, ApplyFilter, ClearFilter } = useDataFilter();
   console.log("[HOOK] saved query is", query);
   const { state, dispatch } = useStore();
+  const [itemCategory, setItemCategory] = useState([]);
+  const [itemType, setItemType] = useState([]);
+
+  useEffect(() => {
+    SetupFilterOptions();
+  }, []);
+
+  async function SetupFilterOptions() {
+    //TODO Check for saved filter options in Async Storage;
+    try {
+      let savedOptions = await AsyncStorage.getItem("@filter_options");
+      console.log("saved options", savedOptions);
+      if (savedOptions == null) {
+        //Perform Logic to find values & save the values
+        const categories = [];
+        const types = [];
+        state.data.catalogue.forEach((item) => {
+          if (!categories.includes(item.itemCategory)) {
+            categories.push(item.itemCategory);
+          }
+          if (!types.includes(item.itemType)) {
+            types.push(item.itemType);
+          }
+        });
+        const category = categories.map((item) => ({
+          name: item.charAt(0) + item.substring(1).toLowerCase(),
+          id: item,
+        }));
+        const type = types.map((item) => ({
+          name: item,
+          id: item,
+        }));
+        let options = {
+          itemCategory: category,
+          itemType: type,
+        };
+        try {
+          await AsyncStorage.setItem("@filter_options", JSON.stringify(options));
+          setItemCategory(options.itemCategory);
+          setItemType(options.itemType);
+        } catch (error) {
+          console.log("Failed to save filter options to AsyncStorage");
+        }
+      } else {
+        //Values already saved, set them to the state
+        let options = JSON.parse(savedOptions);
+        let category = options.itemCategory;
+        let type = options.itemType;
+        console.log("[FILTER] saved category & type", category, type);
+        setItemCategory(category);
+        setItemType(type);
+      }
+    } catch (error) {
+      console.log("Failed to get saved filter options", error);
+    }
+  }
 
   async function clearFilter() {
     await ClearFilter();
@@ -206,14 +263,7 @@ export default function Filter() {
                 {
                   name: "Item Category",
                   id: 0,
-                  children: [
-                    { name: "Rings", id: "RINGS" },
-                    { name: "Pendant", id: "PENDANT" },
-                    { name: "Necklace", id: "NECKLACE" },
-                    { name: "Bracelet", id: "BRACELET" },
-                    { name: "Amulet", id: "AMULET" },
-                    { name: "Medallion", id: "MEDALLION" },
-                  ],
+                  children: itemCategory,
                 },
               ]}
               uniqueKey="id"
@@ -243,11 +293,7 @@ export default function Filter() {
                 {
                   name: "Item Type",
                   id: 0,
-                  children: [
-                    { name: "CH", id: "CH" },
-                    { name: "CHE", id: "CHE" },
-                    { name: "HBR", id: "HBR" },
-                  ],
+                  children: itemType,
                 },
               ]}
               uniqueKey="id"

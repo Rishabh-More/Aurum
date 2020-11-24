@@ -75,7 +75,7 @@ async function LogoutUser(shopId) {
 }
 
 async function ClearUserSession() {
-  const keys = ["@auth_session", "@auth_token"];
+  const keys = ["@auth_session", "@auth_token", "@filter_options"];
   //TODO Clear Shop Data from Realm DB
   try {
     await realm.write(() => {

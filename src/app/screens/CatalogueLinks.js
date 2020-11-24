@@ -4,7 +4,7 @@ import { useTheme, useNavigation } from "@react-navigation/native";
 import { useDeviceOrientation, useDimensions } from "@react-native-community/hooks";
 import { isTablet, isPhone } from "react-native-device-detection";
 import { SafeAreaView, View, Text, StyleSheet, FlatList } from "react-native";
-import { Appbar, Title } from "react-native-paper";
+import { Appbar } from "react-native-paper";
 import { BarIndicator } from "react-native-indicators";
 import { getCatalogueLinks } from "../api/ApiService";
 import CatalogueLinkItem from "../components/pure components/CatalogueLinkItem";
