@@ -12,8 +12,8 @@ export function useDataFilter() {
 
     //Step 1: Sort the array with subset range
     const subset = await data.filter((item) => {
-      var itemGrossWt = parseFloat(item.netWeight);
-      var itemNetWt = parseFloat(item.grossWeight);
+      var itemGrossWt = parseFloat(item.grossWeight);
+      var itemNetWt = parseFloat(item.netWeight);
       if (
         itemGrossWt >= query.range.grossWt.start &&
         itemGrossWt <= query.range.grossWt.end &&
@@ -48,16 +48,19 @@ export function useDataFilter() {
       console.log("[FILTER HOOK] filtered data dispatched", filtered);
       //Dispatch to filter[]
       await dispatch({ type: "UPDATE_FILTER", payload: filtered });
+      await dispatch({ type: "SET_FILTER_FLAG", payload: true });
     } else {
       console.log("[FILTER HOOK] entered negative filter logic");
       //return subset. Dispatch to filter[]
       console.log("[FILTER HOOK] products subset from negative logic");
       await dispatch({ type: "UPDATE_FILTER", payload: subset });
+      await dispatch({ type: "SET_FILTER_FLAG", payload: true });
     }
   }
 
   async function ClearFilter() {
     await dispatch({ type: "CLEAR_FILTER" });
+    await dispatch({ type: "SET_FILTER_FLAG", payload: false });
   }
   //Return whichever items you want to return from the hook.
   //These can be values, arrays and even functions as well

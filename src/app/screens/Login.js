@@ -18,6 +18,7 @@ import { LoginFooter } from "../components/LoginFooter";
 import { LoginContent } from "../components/LoginContent";
 import Toast from "react-native-simple-toast";
 import { DropDownHolder } from "../config/DropDownHolder";
+import FastImage from "react-native-fast-image";
 //TODO For Now, just use uniqueId for Login Api
 export default function Login() {
   //Configs
@@ -187,7 +188,13 @@ export default function Login() {
           flexDirection: responsive.parent,
           backgroundColor: colors.accent,
         }}>
-        <View style={{ flex: 1, justifyContent: "center", alignItems: "center" }}></View>
+        <View style={{ flex: 1, justifyContent: "center", alignItems: "center" }}>
+          <FastImage
+            style={styles.image}
+            source={require("../res/assets/main_logo.png")}
+            resizeMode={FastImage.resizeMode.cover}
+          />
+        </View>
         <View style={{ flex: responsive.main.flex, justifyContent: "center" }}>
           <View style={[styles.content, { backgroundColor: colors.primary }]}>
             <View
@@ -258,5 +265,9 @@ const styles = StyleSheet.create({
     margin: isTablet ? "8%" : "5%",
     justifyContent: "center",
     borderRadius: 25,
+  },
+  image: {
+    width: isTablet ? 500 : 300,
+    height: isTablet ? 500 : 300,
   },
 });
