@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
 import DeviceInfo from "react-native-device-info";
+import { useDatabase } from "../config/Persistence";
 import { useDeviceOrientation } from "@react-native-community/hooks";
 import { useTheme, useNavigation } from "@react-navigation/native";
 import { isTablet } from "react-native-device-detection";
@@ -19,9 +20,11 @@ import { LoginContent } from "../components/LoginContent";
 import Toast from "react-native-simple-toast";
 import { DropDownHolder } from "../config/DropDownHolder";
 import FastImage from "react-native-fast-image";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 //TODO For Now, just use uniqueId for Login Api
 export default function Login() {
   //Configs
+  const realm = useDatabase();
   const navigation = useNavigation();
   const orientation = useDeviceOrientation();
   const { colors, dark } = useTheme();
@@ -56,6 +59,10 @@ export default function Login() {
   const [messagePWD, setPWDMessage] = useState("All Good");
 
   useEffect(() => {
+    DisplayPersistanceDetails();
+  }, []);
+
+  useEffect(() => {
     DeviceInfo.isEmulator().then((isEmulator) => {
       console.log("isEmulator?", isEmulator);
       setIsEmulator(isEmulator);
@@ -73,6 +80,19 @@ export default function Login() {
       setLoading(false);
     }
   }, [isReady]);
+
+  async function DisplayPersistanceDetails() {
+    try {
+      let shop = await realm.objects("Shop");
+      console.log("[LOGIN] Stored Shop Data", shop);
+      let cart = await realm.objects("Cart");
+      console.log("[LOGIN] Stored Cart Data", cart);
+      let keys = await AsyncStorage.getAllKeys();
+      console.log("[LOGIN] Stored Data in Async Storage", keys);
+    } catch (error) {
+      console.log("failed to get persistent data", error);
+    }
+  }
 
   async function VerifyInputs() {
     setLoading(true);

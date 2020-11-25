@@ -34,14 +34,14 @@ export function CustomDrawerContent(props) {
   }, []);
 
   useEffect(() => {
-    SaveThemeSettings();
+    SaveThemeSettings(isDarkTheme);
   }, [isDarkTheme]);
 
   async function getShopData() {
     try {
       let shop = await realm.objects("Shop");
       console.log("Persisted Shop Data", shop);
-      console.log("Shop Id", shop[0].id);
+      //console.log("Shop Id", shop[0].id);
       await setShop(shop[0]);
     } catch (error) {
       console.log("failed to retrieve shop object", error);

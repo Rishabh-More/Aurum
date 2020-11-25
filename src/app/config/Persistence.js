@@ -15,11 +15,11 @@ let realm = new Realm({
   schemaVersion: 5,
 });
 
-async function SaveThemeSettings() {
+async function SaveThemeSettings(isDarkTheme) {
   try {
     console.log("saving in storage: DarkTheme", isDarkTheme);
     await AsyncStorage.setItem("@app_theme_isDark", JSON.stringify(isDarkTheme));
-    DropDownHolder.alert("success", "Theme to Async Storage.");
+    //DropDownHolder.alert("success", "Saved theme to Async Storage.");
   } catch (error) {
     console.log("failed to save theme", error);
     //DropDownHolder.alert("warn", "Failed to save Theme", error);

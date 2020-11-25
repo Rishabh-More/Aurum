@@ -79,7 +79,7 @@ const SingleCatalogueItem = ({ product, columns }) => {
               ? require("../../res/assets/broken-image.png")
               : { uri: product.imageUrl, priority: FastImage.priority.normal }
           }
-          resizeMode={FastImage.resizeMode.cover}
+          resizeMode={FastImage.resizeMode.stretch}
         />
         <ImageView
           images={[{ uri: product.imageUrl }]}

@@ -80,7 +80,7 @@ export default function Verification({ route }) {
     try {
       await dispatch({ type: "UPDATE_SHOP_DETAILS", payload: data.shop });
       await realm.write(() => {
-        realm.create("Shop", data.shop);
+        realm.create("Shop", data.shop, true);
       });
     } catch (error) {
       console.log("failed to save to realm", error);
