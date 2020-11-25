@@ -1,7 +1,7 @@
 const initialQuery = {
   range: {
-    grossWt: { start: 0, end: 100 },
-    netWt: { start: 0, end: 100 },
+    grossWt: { start: 0, end: 0 },
+    netWt: { start: 0, end: 0 },
   },
   itemStatus: [],
   itemCategory: [],

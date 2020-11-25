@@ -18,14 +18,29 @@ export default function Filter() {
   const dimensions = useDimensions();
 
   const { query, updateQuery, ApplyFilter, ClearFilter } = useDataFilter();
-  console.log("[HOOK] saved query is", query);
   const { state, dispatch } = useStore();
+  const [maxNetWeight, setMaxNetWeight] = useState(0);
+  const [maxGrossWeight, setMaxGrossWeight] = useState(0);
   const [itemCategory, setItemCategory] = useState([]);
   const [itemType, setItemType] = useState([]);
 
   useEffect(() => {
+    console.log("[SCREEN] saved query is", query);
+  }, [query]);
+
+  useEffect(() => {
     SetupFilterOptions();
   }, []);
+
+  useEffect(() => {
+    updateQuery({
+      ...query,
+      range: {
+        grossWt: { start: 0, end: maxGrossWeight },
+        netWt: { start: 0, end: maxNetWeight },
+      },
+    });
+  }, [maxNetWeight, maxGrossWeight]);
 
   async function SetupFilterOptions() {
     //TODO Check for saved filter options in Async Storage;
@@ -34,6 +49,23 @@ export default function Filter() {
       console.log("saved options", savedOptions);
       if (savedOptions == null) {
         //Perform Logic to find values & save the values
+        let maxNetWeight = await Math.ceil(
+          Math.max.apply(
+            Math,
+            state.data.catalogue.map(function (item) {
+              return item.netWeight;
+            })
+          )
+        );
+        let maxGrossWeight = await Math.ceil(
+          Math.max.apply(
+            Math,
+            state.data.catalogue.map(function (item) {
+              return item.grossWeight;
+            })
+          )
+        );
+        console.log("[FILTER SCREEN] maxNetWeight & maxGrossWeight", maxNetWeight, maxGrossWeight);
         const categories = [];
         const types = [];
         state.data.catalogue.forEach((item) => {
@@ -53,11 +85,15 @@ export default function Filter() {
           id: item,
         }));
         let options = {
-          itemCategory: category,
-          itemType: type,
+          maxNetWeight: maxNetWeight,
+          maxGrossWeight: maxGrossWeight,
+          itemCategory: category[0].id != "" && category[0].id != "" ? category : [],
+          itemType: type[0].id != "" && type[0].id != "" ? type : [],
         };
         try {
           await AsyncStorage.setItem("@filter_options", JSON.stringify(options));
+          setMaxNetWeight(maxNetWeight);
+          setMaxGrossWeight(maxGrossWeight);
           setItemCategory(options.itemCategory);
           setItemType(options.itemType);
         } catch (error) {
@@ -66,11 +102,11 @@ export default function Filter() {
       } else {
         //Values already saved, set them to the state
         let options = JSON.parse(savedOptions);
-        let category = options.itemCategory;
-        let type = options.itemType;
-        console.log("[FILTER] saved category & type", category, type);
-        setItemCategory(category);
-        setItemType(type);
+        console.log("[FILTER] saved category & type", options.itemCategory, options.itemType);
+        setMaxNetWeight(options.maxNetWeight);
+        setMaxGrossWeight(options.maxGrossWeight);
+        setItemCategory(options.itemCategory);
+        setItemType(options.itemType);
       }
     } catch (error) {
       console.log("Failed to get saved filter options", error);
@@ -81,8 +117,8 @@ export default function Filter() {
     await ClearFilter();
     updateQuery({
       range: {
-        grossWt: { start: 0, end: 100 },
-        netWt: { start: 0, end: 100 },
+        grossWt: { start: 0, end: maxGrossWeight },
+        netWt: { start: 0, end: maxNetWeight },
       },
       itemStatus: [],
       itemCategory: [],
@@ -258,6 +294,7 @@ export default function Filter() {
           <View style={{ marginStart: 15, marginEnd: 15 }}>
             <Title>Item Category</Title>
             <SectionedMultiSelect
+              disabled={itemCategory.length == 0 ? true : false}
               colors={{ primary: colors.accent, chipColor: colors.accent }}
               items={[
                 {
@@ -269,7 +306,7 @@ export default function Filter() {
               uniqueKey="id"
               subKey="children"
               IconRenderer={Icon}
-              selectText="Select Category"
+              selectText={itemCategory.length != 0 ? "Select Category" : "No Options Available"}
               showDropDowns={false}
               styles={{
                 container: {
@@ -281,13 +318,14 @@ export default function Filter() {
                 modalWrapper: { justifyContent: "center" },
               }}
               onSelectedItemsChange={(value) => updateQuery({ ...query, itemCategory: value })}
-              selectedItems={query.itemCategory}
+              selectedItems={itemCategory.length != 0 ? query.itemCategory : []}
               showRemoveAll={true}
             />
           </View>
           <View style={{ marginStart: 15, marginEnd: 15 }}>
             <Title>Item Type</Title>
             <SectionedMultiSelect
+              disabled={itemType.length == 0 ? true : false}
               colors={{ primary: colors.accent, chipColor: colors.accent }}
               items={[
                 {
@@ -311,7 +349,7 @@ export default function Filter() {
                 modalWrapper: { justifyContent: "center" },
               }}
               onSelectedItemsChange={(value) => updateQuery({ ...query, itemType: value })}
-              selectedItems={query.itemType}
+              selectedItems={itemType.length != 0 ? query.itemType : []}
               showRemoveAll={true}
             />
           </View>

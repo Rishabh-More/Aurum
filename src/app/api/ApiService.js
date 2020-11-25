@@ -1,5 +1,7 @@
 import Axios from "axios";
 import { getAuthToken } from "../config/Persistence";
+import { LogoutUser } from "../config/Persistence";
+import { Alert } from "react-native";
 
 const BASE_URL = "http://35.188.220.243:1337/";
 
@@ -25,6 +27,35 @@ const LOG_OUT = "logoutShop";
 let service = Axios.create({
   baseURL: BASE_URL,
   timeout: 10000,
+});
+
+service.interceptors.response.use((response) => {
+  console.log("[API] response intercepted data", response.data.message);
+  if (!response.data.status && response.data.tokenExpired) {
+    //TODO Show Alert Session has expired
+    Alert.alert(
+      "Your Session has Expired!",
+      "Don't worry though. You just need to login again & you're set.",
+      [
+        {
+          text: "Continue",
+          style: "default",
+          onPress: () => {
+            LogoutUser()
+              .then((success) => {
+                if (success) {
+                  //setAuthorization(false);
+                }
+              })
+              .catch((error) => {
+                console.log("failed to logout after session expiry", error);
+              });
+          },
+        },
+      ]
+    );
+  }
+  return response;
 });
 
 async function SessionValidator(response) {
