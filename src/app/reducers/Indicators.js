@@ -18,6 +18,8 @@ const indicatorReducer = (state, action) => {
       return { ...state, linksRefreshed: action.payload };
     case "SERVE_FEATURE_REQUEST":
       return { ...state, requestedFeature: action.payload };
+    case "CLEAR_FEATURE_REQUEST":
+      return { ...state, requestedFeature: "" };
     default:
       return state;
   }

@@ -24,9 +24,14 @@ export default function Cart() {
   const { state, dispatch } = useStore();
 
   useEffect(() => {
-    //If No feature has been selected, ask user for feature
-    RequestFeature();
-  }, []);
+    //Screen is focused, ask Confirmation for Checkout Method.
+    const screenFocus = navigation.addListener("focus", () => {
+      //If No feature has been selected, ask user for feature
+      RequestFeature();
+    });
+    //Unsubscribe to listener if component gets unmounted;
+    return screenFocus;
+  }, [navigation]);
 
   useEffect(() => {
     console.log("[CART] Cart updated in store", state.data.cart);
@@ -45,7 +50,7 @@ export default function Cart() {
   }
 
   function RequestFeature() {
-    if (state.indicators.requestedFeature == "" && state.data.cart.length != 0) {
+    if (state.data.cart.length != 0) {
       Alert.alert("Checkout Method", `How would you like to checkout products from Cart?`, [
         {
           text: "Generate Order",
