@@ -70,7 +70,7 @@ export function CatalogueCartFooter() {
             start: { x: 1, y: 1 },
             end: { x: 1, y: 0 },
           }}
-          onPress={() => setVisible(true)}
+          onPress={() => navigation.navigate("Cart")}
         />
       </View>
       <Overlay
@@ -119,7 +119,7 @@ export function CatalogueCartFooter() {
               onPress={async () => {
                 await dispatch({ type: "SERVE_FEATURE_REQUEST", payload: "order" });
                 setVisible(false);
-                navigation.navigate("Cart");
+                navigation.navigate("cart");
               }}
             />
             <Button
@@ -146,7 +146,7 @@ export function CatalogueCartFooter() {
               onPress={async () => {
                 await dispatch({ type: "SERVE_FEATURE_REQUEST", payload: "link" });
                 setVisible(false);
-                navigation.navigate("Cart");
+                navigation.navigate("cart");
               }}
             />
           </View>

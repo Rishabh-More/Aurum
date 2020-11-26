@@ -15,9 +15,9 @@
             <BuildableReference
                BuildableIdentifier = "primary"
                BlueprintIdentifier = "2D02E47A1E0B4A5D006451C7"
-               BuildableName = "Aurum-tvOS.app"
-               BlueprintName = "Aurum-tvOS"
-               ReferencedContainer = "container:Aurum.xcodeproj">
+               BuildableName = "DesignReel-tvOS.app"
+               BlueprintName = "DesignReel-tvOS"
+               ReferencedContainer = "container:DesignReel.xcodeproj">
             </BuildableReference>
          </BuildActionEntry>
       </BuildActionEntries>
@@ -33,9 +33,9 @@
             <BuildableReference
                BuildableIdentifier = "primary"
                BlueprintIdentifier = "2D02E48F1E0B4A5D006451C7"
-               BuildableName = "Aurum-tvOSTests.xctest"
-               BlueprintName = "Aurum-tvOSTests"
-               ReferencedContainer = "container:Aurum.xcodeproj">
+               BuildableName = "DesignReel-tvOSTests.xctest"
+               BlueprintName = "DesignReel-tvOSTests"
+               ReferencedContainer = "container:DesignReel.xcodeproj">
             </BuildableReference>
          </TestableReference>
       </Testables>
@@ -55,9 +55,9 @@
          <BuildableReference
             BuildableIdentifier = "primary"
             BlueprintIdentifier = "2D02E47A1E0B4A5D006451C7"
-            BuildableName = "Aurum-tvOS.app"
-            BlueprintName = "Aurum-tvOS"
-            ReferencedContainer = "container:Aurum.xcodeproj">
+            BuildableName = "DesignReel-tvOS.app"
+            BlueprintName = "DesignReel-tvOS"
+            ReferencedContainer = "container:DesignReel.xcodeproj">
          </BuildableReference>
       </BuildableProductRunnable>
    </LaunchAction>
@@ -72,9 +72,9 @@
          <BuildableReference
             BuildableIdentifier = "primary"
             BlueprintIdentifier = "2D02E47A1E0B4A5D006451C7"
-            BuildableName = "Aurum-tvOS.app"
-            BlueprintName = "Aurum-tvOS"
-            ReferencedContainer = "container:Aurum.xcodeproj">
+            BuildableName = "DesignReel-tvOS.app"
+            BlueprintName = "DesignReel-tvOS"
+            ReferencedContainer = "container:DesignReel.xcodeproj">
          </BuildableReference>
       </BuildableProductRunnable>
    </ProfileAction>

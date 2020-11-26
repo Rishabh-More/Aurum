@@ -35,12 +35,12 @@ android_library(
 
 android_build_config(
     name = "build_config",
-    package = "com.aurum",
+    package = "com.invizio.designreel",
 )
 
 android_resource(
     name = "res",
-    package = "com.aurum",
+    package = "com.invizio.designreel",
     res = "src/main/res",
 )
 

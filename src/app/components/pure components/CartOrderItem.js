@@ -111,7 +111,7 @@ const CartOrderItem = ({ cart }) => {
                   ? require("../../res/assets/broken-image.png")
                   : { uri: cart.imageUrl }
               }
-              resizeMode={FastImage.resizeMode.cover}
+              resizeMode={FastImage.resizeMode.stretch}
             />
           </View>
         </View>
@@ -247,15 +247,15 @@ const CartOrderItem = ({ cart }) => {
               }}
             />
           </View>
-          {state.indicators.requestedFeature == "order" ? (
-            <View
-              style={{
-                flex: 1,
-                flexDirection: "row",
-                margin: 5,
-                justifyContent: "flex-end",
-                alignItems: "center",
-              }}>
+          <View
+            style={{
+              flex: 1,
+              flexDirection: "row",
+              margin: 5,
+              justifyContent: "flex-end",
+              alignItems: "center",
+            }}>
+            {state.indicators.requestedFeature == "order" ? (
               <Counter
                 start={cart.orderProductQuantity}
                 min={1}
@@ -277,26 +277,22 @@ const CartOrderItem = ({ cart }) => {
                   if (updated) setUpdated(false);
                 }}
               />
-              <Button
-                type="outline"
-                icon={
-                  <MaterialCommunityIcons
-                    name="trash-can-outline"
-                    size={24}
-                    color={colors.accent}
-                  />
-                }
-                buttonStyle={{
-                  margin: 5,
-                  alignSelf: "flex-end",
-                  borderColor: colors.accent,
-                  borderRadius: 10,
-                  borderWidth: 0.5,
-                }}
-                onPress={() => removeFromCart()}
-              />
-            </View>
-          ) : null}
+            ) : null}
+            <Button
+              type="outline"
+              icon={
+                <MaterialCommunityIcons name="trash-can-outline" size={24} color={colors.accent} />
+              }
+              buttonStyle={{
+                margin: 5,
+                alignSelf: "flex-end",
+                borderColor: colors.accent,
+                borderRadius: 10,
+                borderWidth: 0.5,
+              }}
+              onPress={() => removeFromCart()}
+            />
+          </View>
         </View>
       </View>
     </Card>

@@ -189,7 +189,7 @@ export default function Filter() {
                 values={[query.range.grossWt.start, query.range.grossWt.end]}
                 isMarkersSeparated={true}
                 min={parseFloat(0)}
-                max={parseFloat(100)}
+                max={maxGrossWeight != 0 ? maxGrossWeight : parseFloat(100)}
                 allowOverlap={false}
                 minMarkerOverlapDistance={10}
                 onValuesChangeFinish={(value) =>
@@ -242,7 +242,7 @@ export default function Filter() {
                 values={[query.range.netWt.start, query.range.netWt.end]}
                 isMarkersSeparated={true}
                 min={parseFloat(0)}
-                max={parseFloat(100)}
+                max={maxNetWeight != 0 ? maxNetWeight : parseFloat(100)}
                 allowOverlap={false}
                 minMarkerOverlapDistance={10}
                 onValuesChangeFinish={(value) =>
