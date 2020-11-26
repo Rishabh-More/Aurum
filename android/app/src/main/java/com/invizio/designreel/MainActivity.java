@@ -1,7 +1,7 @@
-package com.aurum;
+package com.invizio.designreel;
 
 import android.os.Bundle;
-import com.aurum.*;
+import com.invizio.designreel.*;
 import com.facebook.react.ReactActivity;
 import org.devio.rn.splashscreen.SplashScreen;
 
@@ -19,6 +19,6 @@ public class MainActivity extends ReactActivity {
    */
   @Override
   protected String getMainComponentName() {
-    return "Aurum";
+    return "DesignReel";
   }
 }
