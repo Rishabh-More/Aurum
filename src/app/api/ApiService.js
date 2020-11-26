@@ -1,4 +1,5 @@
 import Axios from "axios";
+import { authorizer, storeDispatch, shopId } from "../navigation/Authorizer";
 import { getAuthToken } from "../config/Persistence";
 import { LogoutUser } from "../config/Persistence";
 import { Alert } from "react-native";
@@ -31,7 +32,6 @@ let service = Axios.create({
 });
 
 service.interceptors.response.use((response) => {
-  console.log("[API] response intercepted data", response.data.message);
   if (!response.data.status && response.data.tokenExpired) {
     //TODO Show Alert Session has expired
     Alert.alert(
@@ -42,10 +42,13 @@ service.interceptors.response.use((response) => {
           text: "Continue",
           style: "default",
           onPress: () => {
-            LogoutUser()
+            const id = shopId.current;
+            const dispatch = storeDispatch.current;
+            const SessionExpired = authorizer.current;
+            LogoutUser(id, dispatch)
               .then((success) => {
                 if (success) {
-                  //setAuthorization(false);
+                  SessionExpired();
                 }
               })
               .catch((error) => {

@@ -9,6 +9,9 @@ import AuthStacks from "./AuthStacks";
 const SplashContext = createContext();
 const AuthContext = createContext();
 
+export var authorizer = React.createRef();
+export var storeDispatch = React.createRef();
+export var shopId = React.createRef();
 export const useAuthorization = () => useContext(AuthContext);
 
 export function Authorizer() {
@@ -20,6 +23,17 @@ export function Authorizer() {
   useEffect(() => {
     VerifyCredentials();
   }, []);
+
+  useEffect(() => {
+    shopId.current = state.shop.id;
+    storeDispatch.current = dispatch;
+    authorizer.current = SessionExpired;
+  }, [state.shop]);
+
+  async function SessionExpired() {
+    console.log("[AUTHORIZER] session expired trigger from somewhere else");
+    await setAuthorization(false);
+  }
 
   async function VerifyCredentials() {
     //TODO Check from Async Storage?
