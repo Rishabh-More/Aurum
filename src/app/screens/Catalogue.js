@@ -3,8 +3,10 @@ import { useStore } from "../config/Store";
 import { useDatabase } from "../config/Persistence";
 import { useTheme } from "@react-navigation/native";
 import useSortFilter from "../hooks/useSortFilter";
+import { useDataFilter } from "../hooks/useDataFilter";
 import { useDeviceOrientation, useDimensions } from "@react-native-community/hooks";
 import { isTablet, isPhone } from "react-native-device-detection";
+import { DropDownHolder } from "../config/DropDownHolder";
 import { SafeAreaView, StyleSheet, View, Text, FlatList } from "react-native";
 import { BarIndicator } from "react-native-indicators";
 import { CatalogueCustomHeader } from "../components/CatalogueCustomHeader";
@@ -27,7 +29,9 @@ export default function Catalogue() {
   //State Codes
   const { state, dispatch } = useStore();
   const { SortBy } = useSortFilter();
+  const { query, updateQuery, ApplyFilter, ClearFilter } = useDataFilter();
   const [refresh, updateRefresh] = useState(false);
+  const [isRefreshing, setRefreshing] = useState(false);
 
   useEffect(() => {
     console.log("[CATALOGUE] State object", state);
@@ -36,7 +40,6 @@ export default function Catalogue() {
         console.log("api response", data);
         dispatch({ type: "SET_PRODUCTS", payload: data });
         overlay.current = !overlay.current;
-
         //Check for Saved Cart items
         CheckSavedCart();
       })
@@ -106,6 +109,51 @@ export default function Catalogue() {
     }
   }
 
+  async function ClearCartItems() {
+    try {
+      await realm.write(() => {
+        let cart = realm.objects("Cart");
+        realm.delete(cart);
+      });
+      await dispatch({ type: "CLEAR_CART" });
+    } catch (error) {
+      console.log("failed to clear cart", error);
+    }
+  }
+
+  async function ValidateFilterNUpdateProducts() {
+    setRefreshing(true);
+    if (state.data.cart.length != 0) {
+      await ClearCartItems();
+    }
+    if (state.data.isFilterApplied) {
+      //Clear the Filter first
+      await ClearFilter();
+      await updateQuery({
+        range: {
+          grossWt: { start: 0, end: maxGrossWeight },
+          netWt: { start: 0, end: maxNetWeight },
+        },
+        itemStatus: [],
+        itemCategory: [],
+        itemType: [],
+      });
+      await dispatch({ type: "CLEAR_QUERY" });
+    }
+    await getProductsFromShop(state.shop.id)
+      .then((data) => {
+        console.log("api response", data);
+        dispatch({ type: "SET_PRODUCTS", payload: data });
+        setRefreshing(false);
+      })
+      .catch((error) => {
+        console.log("[CATALOGUE] failed to update products", error);
+        DropDownHolder.alert("error", "Failed to Update Catalogue Items", error);
+        setRefreshing(false);
+        return;
+      });
+  }
+
   return (
     <SafeAreaView style={[styles.container, { backgroundColor: colors.accentDark }]}>
       <CatalogueCustomHeader />
@@ -117,7 +165,7 @@ export default function Catalogue() {
           borderBottomRightRadius: state.data.cart.length != 0 ? 30 : 0,
         }}>
         <FlatList
-          key={[orientation.landscape, orientation.portrait, state.data.products.length]}
+          key={[orientation.landscape, orientation.portrait, state.data.products]}
           numColumns={isPhone ? phoneColumns : tabColumns}
           style={styles.flatlist}
           columnWrapperStyle={styles.columns}
@@ -132,6 +180,10 @@ export default function Catalogue() {
             ) : (
               <SingleCatalogueItem product={item} columns={isPhone ? phoneColumns : tabColumns} />
             );
+          }}
+          refreshing={isRefreshing}
+          onRefresh={() => {
+            ValidateFilterNUpdateProducts();
           }}
         />
 
