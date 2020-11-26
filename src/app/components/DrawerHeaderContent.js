@@ -4,7 +4,7 @@ import { Avatar, Title, Caption } from "react-native-paper";
 
 export function DrawerHeaderContent({ theme, shop }) {
   const { colors } = theme;
-  const avatar = shop.company.companyLogoUrl;
+  const avatar = shop.shopLogoUrl;
 
   return (
     <View style={drawerHeader.container}>

@@ -1,7 +1,7 @@
 import React, { createContext, useContext } from "react";
 import DeviceInfo from "react-native-device-info";
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import { ShopSchema, CompanySchema, AddressSchema, CartSchema } from "../config/Schemas";
+import { ShopSchema, CartSchema } from "../config/Schemas";
 import { DropDownHolder } from "./DropDownHolder";
 import { logoutFromShop } from "../api/ApiService";
 //import { Realm } from "realm";
@@ -11,8 +11,8 @@ const useDatabase = () => useContext(DatabaseContext);
 
 let realm = new Realm({
   path: "PersistantDatabase.realm",
-  schema: [ShopSchema, CompanySchema, AddressSchema, CartSchema],
-  schemaVersion: 5,
+  schema: [ShopSchema, CartSchema],
+  schemaVersion: 6,
 });
 
 async function SaveThemeSettings(isDarkTheme) {
@@ -54,13 +54,14 @@ async function getAuthToken() {
   }
 }
 
-async function LogoutUser(shopId) {
+async function LogoutUser(shopId, dispatch) {
   try {
     return new Promise(async function (resolve, reject) {
       //TODO Call signout api
       await logoutFromShop(shopId, DeviceInfo.getUniqueId())
         .then(async (status) => {
           console.log("logged out?", status);
+          await dispatch({ type: "CLEAR_SHOP" });
           await ClearUserSession();
           resolve(status);
         })
@@ -80,6 +81,7 @@ async function ClearUserSession() {
   try {
     await realm.write(() => {
       let shop = realm.objects("Shop");
+      console.log("[PERSISTENCE] Stored Shop Data", shop);
       realm.delete(shop);
       let cart = realm.objects("Cart");
       realm.delete(cart);

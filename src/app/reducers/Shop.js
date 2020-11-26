@@ -2,12 +2,10 @@ const initialShop = {
   id: 0,
   email: "",
   shopName: "",
-  company: {
-    id: 0,
-    email: "",
-    companyName: "",
-    companyLogoUrl: "",
-  },
+  companyId: 0,
+  addressId: 0,
+  features: "",
+  licenseKey: "",
 };
 
 const shopReducer = (state, action) => {
@@ -18,7 +16,21 @@ const shopReducer = (state, action) => {
         id: action.payload.id,
         email: action.payload.email,
         shopName: action.payload.shopName,
-        company: action.payload.company,
+        companyId: action.payload.companyId,
+        addressId: action.payload.addressId,
+        features: action.payload.features,
+        licenseKey: action.payload.licenseKey,
+      };
+    case "CLEAR_SHOP":
+      return {
+        ...state,
+        id: 0,
+        email: "",
+        shopName: "",
+        companyId: 0,
+        addressId: 0,
+        features: "",
+        licenseKey: "",
       };
     default:
       return state;

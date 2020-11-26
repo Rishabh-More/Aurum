@@ -1,5 +1,6 @@
 import React, { useContext, useState, useEffect } from "react";
 import { ThemeContext } from "../../App";
+import { useStore } from "../config/Store";
 import { useTheme } from "@react-navigation/native";
 import { useDatabase, SaveThemeSettings, LogoutUser } from "../config/Persistence";
 import { useAuthorization } from "../navigation/Authorizer";
@@ -17,13 +18,9 @@ export function CustomDrawerContent(props) {
   const { colors, dark, name } = theme;
 
   const realm = useDatabase();
+  const { state, dispatch } = useStore();
   const [shop, setShop] = useState({
-    company: {
-      companyLogoUrl: "https://www.gravatar.com/avatar/205e460b479e2e5b48aec07710c08d50",
-      companyName: "Getting Shop Details...",
-      email: "Getting Shop Details...",
-      id: 0,
-    },
+    shopLogoUrl: "https://www.gravatar.com/avatar/205e460b479e2e5b48aec07710c08d50",
     email: "Getting Shop Details...",
     id: 0,
     shopName: "Getting Shop Details...",
@@ -32,6 +29,10 @@ export function CustomDrawerContent(props) {
   useEffect(() => {
     getShopData();
   }, []);
+
+  useEffect(() => {
+    console.log("[DRAWER] local shopvariable set to", shop);
+  }, [shop]);
 
   useEffect(() => {
     SaveThemeSettings(isDarkTheme);
@@ -57,9 +58,16 @@ export function CustomDrawerContent(props) {
         onPress: () => {
           props.navigation.closeDrawer();
           //TODO Show some kind of Splash/Overlay while waiting for Api response + clearing credential data
-          LogoutUser(shop.id)
+          setShop({
+            shopLogoUrl: "https://www.gravatar.com/avatar/205e460b479e2e5b48aec07710c08d50",
+            email: "Getting Shop Details...",
+            id: 0,
+            shopName: "Getting Shop Details...",
+          });
+          LogoutUser(shop.id, dispatch)
             .then((success) => {
               if (success) {
+                dispatch({ type: "CLEAR_PRODUCTS" });
                 setAuthorization(false);
               }
             })

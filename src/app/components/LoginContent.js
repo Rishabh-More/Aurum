@@ -79,7 +79,7 @@ export function LoginContent(props) {
         </View>
       </View>
       {/**License & Device Wrapper */}
-      <View style={{ flexDirection: isTablet ? "row" : "column" }}>
+      {/* <View style={{ flexDirection: isTablet ? "row" : "column", backgroundColor: "blue" }}>
         <View style={styles.input}>
           <TextInput
             mode="outlined"
@@ -110,7 +110,7 @@ export function LoginContent(props) {
             </HelperText>
           ) : null}
         </View>
-      </View>
+      </View> */}
     </View>
   );
 }

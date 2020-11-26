@@ -8,53 +8,57 @@ export function useDataFilter() {
   const [query, updateQuery] = useState(state.filters);
 
   async function ApplyFilter() {
-    let data = state.data.catalogue;
+    try {
+      let data = state.data.catalogue;
 
-    //Step 1: Sort the array with subset range
-    const subset = await data.filter((item) => {
-      var itemGrossWt = parseFloat(item.grossWeight);
-      var itemNetWt = parseFloat(item.netWeight);
-      if (
-        itemGrossWt >= query.range.grossWt.start &&
-        itemGrossWt <= query.range.grossWt.end &&
-        itemNetWt >= query.range.netWt.start &&
-        itemNetWt <= query.range.netWt.end
-      ) {
-        return true;
-      } else {
-        return false;
-      }
-    });
-    console.log("[FILTER HOOK] products subset is", subset);
-
-    //Step 2: Remove the range object from query and
-    //clean the object from any empty arrays i.e. No Selection.
-    const cleaned_query = {};
-    await Object.keys(query).forEach((key) => {
-      const value = query[key];
-      if (value.length) cleaned_query[key] = value;
-    });
-    console.log("[FILTER HOOK] cleaned query is", cleaned_query);
-
-    //Step 3: Filter the subset data and update filter
-    if (Object.keys(cleaned_query).length !== 0) {
-      console.log("[FILTER HOOK] entered positive filter logic");
-      //return filtered data from subset
-      const filtered = await subset.filter(function (item) {
-        return Object.entries(cleaned_query).every(
-          ([key, value]) => value.includes(item[key]) && value.length
-        );
+      //Step 1: Sort the array with subset range
+      const subset = await data.filter((item) => {
+        var itemGrossWt = parseFloat(item.grossWeight);
+        var itemNetWt = parseFloat(item.netWeight);
+        if (
+          itemGrossWt >= query.range.grossWt.start &&
+          itemGrossWt <= query.range.grossWt.end &&
+          itemNetWt >= query.range.netWt.start &&
+          itemNetWt <= query.range.netWt.end
+        ) {
+          return true;
+        } else {
+          return false;
+        }
       });
-      console.log("[FILTER HOOK] filtered data dispatched", filtered);
-      //Dispatch to filter[]
-      await dispatch({ type: "UPDATE_FILTER", payload: filtered });
-      await dispatch({ type: "SET_FILTER_FLAG", payload: true });
-    } else {
-      console.log("[FILTER HOOK] entered negative filter logic");
-      //return subset. Dispatch to filter[]
-      console.log("[FILTER HOOK] products subset from negative logic");
-      await dispatch({ type: "UPDATE_FILTER", payload: subset });
-      await dispatch({ type: "SET_FILTER_FLAG", payload: true });
+      console.log("[FILTER HOOK] products subset is", subset);
+
+      //Step 2: Remove the range object from query and
+      //clean the object from any empty arrays i.e. No Selection.
+      const cleaned_query = {};
+      await Object.keys(query).forEach((key) => {
+        const value = query[key];
+        if (value.length) cleaned_query[key] = value;
+      });
+      console.log("[FILTER HOOK] cleaned query is", cleaned_query);
+
+      //Step 3: Filter the subset data and update filter
+      if (Object.keys(cleaned_query).length !== 0) {
+        console.log("[FILTER HOOK] entered positive filter logic");
+        //return filtered data from subset
+        const filtered = await subset.filter(function (item) {
+          return Object.entries(cleaned_query).every(
+            ([key, value]) => value.includes(item[key]) && value.length
+          );
+        });
+        console.log("[FILTER HOOK] filtered data dispatched", filtered);
+        //Dispatch to filter[]
+        await dispatch({ type: "UPDATE_FILTER", payload: filtered });
+        await dispatch({ type: "SET_FILTER_FLAG", payload: true });
+      } else {
+        console.log("[FILTER HOOK] entered negative filter logic");
+        //return subset. Dispatch to filter[]
+        console.log("[FILTER HOOK] products subset from negative logic");
+        await dispatch({ type: "UPDATE_FILTER", payload: subset });
+        await dispatch({ type: "SET_FILTER_FLAG", payload: true });
+      }
+    } catch (error) {
+      console.log("[FILTER HOOK] an error occured when applying filter", error);
     }
   }
 

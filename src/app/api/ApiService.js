@@ -5,9 +5,10 @@ import { Alert } from "react-native";
 
 const BASE_URL = "http://35.188.220.243:1337/";
 
+const SHOP = "shop";
 const SHOP_LOGIN = "shoplogin";
 const GENERATE_OTP = "generateotp";
-const SHOP = "shop";
+const SIMPLE_SHOP_LOGIN = `${SHOP}/dashboard/login`;
 
 const FETCH_PRODUCTS = "products";
 const GET_CUSTOMERS = "customers";
@@ -72,14 +73,32 @@ async function SessionValidator(response) {
   } catch (error) {}
 }
 
+async function simpleLoginToShop(login) {
+  console.log("[API] Simple Shop Login url is", SIMPLE_SHOP_LOGIN);
+  var token = await getAuthToken();
+  try {
+    return new Promise(async function (resolve, reject) {
+      const response = await service.post(SIMPLE_SHOP_LOGIN, login, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      if (response.data.status) {
+        console.log("response received");
+        resolve(response.data.data);
+      } else {
+        reject(response.data.message);
+      }
+    });
+  } catch (error) {
+    console.log("request error", error.message);
+  }
+}
+
 async function generateLoginOTP(login) {
   var token = await getAuthToken();
   try {
     return new Promise(async function (resolve, reject) {
       const response = await service.post(GENERATE_OTP, login, {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
+        headers: { Authorization: `Bearer ${token}` },
       });
       if (response.data.status) {
         console.log("response received");
@@ -98,9 +117,7 @@ async function loginToShop(login) {
   try {
     return new Promise(async function (resolve, reject) {
       const response = await service.post(SHOP_LOGIN, login, {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
+        headers: { Authorization: `Bearer ${token}` },
       });
       if (response.data.status) {
         resolve(response.data.data); //TODO resolve either the data or message for login api
@@ -314,6 +331,7 @@ function TestSampleApi() {
 
 export {
   TestSampleApi,
+  simpleLoginToShop,
   generateLoginOTP,
   loginToShop,
   getProductsFromShop,

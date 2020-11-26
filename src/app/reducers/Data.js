@@ -11,6 +11,8 @@ const dataReducer = (state, action) => {
   switch (action.type) {
     case "SET_PRODUCTS":
       return { ...state, catalogue: action.payload, products: action.payload };
+    case "CLEAR_PRODUCTS":
+      return { ...state, catalogue: [], products: [] };
     case "UPDATE_PRODUCTS":
       return { ...state, products: action.payload };
     case "SEARCH_PRODUCTS":

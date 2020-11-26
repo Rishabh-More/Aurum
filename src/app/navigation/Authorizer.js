@@ -39,6 +39,7 @@ export function Authorizer() {
   async function DispatchShopData() {
     try {
       let shop = await realm.objects("Shop");
+      console.log("[AUTHORIZER] dispatching realm shop", shop[0]);
       await dispatch({ type: "UPDATE_SHOP_DETAILS", payload: shop[0] });
     } catch (error) {
       console.log("failed to retrieve shop object", error);

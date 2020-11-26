@@ -19,6 +19,7 @@ export default function Filter() {
 
   const { query, updateQuery, ApplyFilter, ClearFilter } = useDataFilter();
   const { state, dispatch } = useStore();
+  const [loading, setLoading] = useState(false);
   const [maxNetWeight, setMaxNetWeight] = useState(0);
   const [maxGrossWeight, setMaxGrossWeight] = useState(0);
   const [itemCategory, setItemCategory] = useState([]);
@@ -111,6 +112,21 @@ export default function Filter() {
     } catch (error) {
       console.log("Failed to get saved filter options", error);
     }
+  }
+
+  async function DispatchNApplyFilter() {
+    console.log("filter query is", query);
+    await dispatch({ type: "UPDATE_QUERY", payload: query });
+    ApplyFilter()
+      .then(() => {
+        setLoading(false);
+        navigation.goBack();
+      })
+      .catch((error) => {
+        console.log("Failed to apply Filter", error);
+        Toast.show("Couldn't Apply Filter");
+        return;
+      });
   }
 
   async function clearFilter() {
@@ -377,12 +393,12 @@ export default function Filter() {
         />
         <Button
           title="Apply"
+          loading={loading}
           containerStyle={{ flex: 1 }}
           buttonStyle={{ backgroundColor: colors.accent, margin: 5, height: 50, borderRadius: 15 }}
-          onPress={async () => {
-            console.log("filter query is", query);
-            await dispatch({ type: "UPDATE_QUERY", payload: query });
-            ApplyFilter();
+          onPress={() => {
+            setLoading(true);
+            DispatchNApplyFilter();
           }}
         />
       </View>

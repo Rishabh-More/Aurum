@@ -1,10 +1,13 @@
 import React, { useState, useEffect } from "react";
 import DeviceInfo from "react-native-device-info";
+import { useStore } from "../config/Store";
 import { useDatabase } from "../config/Persistence";
+import { useAuthorization } from "./../navigation/Authorizer";
 import { useDeviceOrientation } from "@react-native-community/hooks";
 import { useTheme, useNavigation } from "@react-navigation/native";
 import { isTablet } from "react-native-device-detection";
-import { generateLoginOTP } from "../api/ApiService";
+import AsyncStorage from "@react-native-async-storage/async-storage";
+import { simpleLoginToShop, generateLoginOTP } from "../api/ApiService";
 import {
   Platform,
   SafeAreaView,
@@ -20,21 +23,25 @@ import { LoginContent } from "../components/LoginContent";
 import Toast from "react-native-simple-toast";
 import { DropDownHolder } from "../config/DropDownHolder";
 import FastImage from "react-native-fast-image";
-import AsyncStorage from "@react-native-async-storage/async-storage";
 //TODO For Now, just use uniqueId for Login Api
 export default function Login() {
   //Configs
   const realm = useDatabase();
   const navigation = useNavigation();
   const orientation = useDeviceOrientation();
+  const { setAuthorization } = useAuthorization();
   const { colors, dark } = useTheme();
+
+  const { state, dispatch } = useStore();
 
   const responsive = {
     parent: isTablet && orientation.landscape ? "row" : "column",
-    main: { flex: isTablet ? 1.5 : 3 },
+    main: { flex: isTablet ? 1.5 : 1 },
     header: { flex: isTablet ? 0 : 1, justifyContent: isTablet ? "center" : null },
     button: { flex: isTablet ? 0 : 1, justifyContent: isTablet ? "center" : null },
   };
+
+  console.log("responsive parent orientation", orientation.landscape, responsive.parent);
 
   /** State Codes */
   //States
@@ -43,24 +50,20 @@ export default function Login() {
   const [login, setLogin] = useState({
     email: "",
     password: "",
-    licenseKey: "",
-    deviceName: "",
+    //licenseKey: "",
+    //deviceName: "",
   });
   const [loading, setLoading] = useState(false);
 
   //Errors
   const [errorEmail, setEmailError] = useState(false);
   const [errorPWD, setPWDError] = useState(false);
-  const [errorLicense, setLicenseError] = useState(false);
-  const [errorDevice, setDeviceError] = useState(false);
+  //const [errorLicense, setLicenseError] = useState(false);
+  //const [errorDevice, setDeviceError] = useState(false);
 
   //Error Messages
   const [messageEmail, setEmailMessage] = useState("Looks Good");
   const [messagePWD, setPWDMessage] = useState("All Good");
-
-  useEffect(() => {
-    DisplayPersistanceDetails();
-  }, []);
 
   useEffect(() => {
     DeviceInfo.isEmulator().then((isEmulator) => {
@@ -75,24 +78,12 @@ export default function Login() {
 
   useEffect(() => {
     if (isReady) {
-      GenerateOTP();
+      //GenerateOTP();
+      PerformDashboardLogin();
     } else {
       setLoading(false);
     }
   }, [isReady]);
-
-  async function DisplayPersistanceDetails() {
-    try {
-      let shop = await realm.objects("Shop");
-      console.log("[LOGIN] Stored Shop Data", shop);
-      let cart = await realm.objects("Cart");
-      console.log("[LOGIN] Stored Cart Data", cart);
-      let keys = await AsyncStorage.getAllKeys();
-      console.log("[LOGIN] Stored Data in Async Storage", keys);
-    } catch (error) {
-      console.log("failed to get persistent data", error);
-    }
-  }
 
   async function VerifyInputs() {
     setLoading(true);
@@ -131,27 +122,86 @@ export default function Login() {
       setPWDMessage("");
       setPWDError(false);
     }
-    if (login.licenseKey == "") {
-      //License Key can't be Empty
-      await setLoading(false);
-      setLicenseError(true);
-      return;
-    } else {
-      console.log("License resolved");
-      setLicenseError(false);
-    }
-    if (login.deviceName == "") {
-      //Device Name can't be empty as well
-      await setLoading(false);
-      setDeviceError(true);
-      return;
-    } else {
-      console.log("Device name resolved");
-      setDeviceError(false);
-    }
+    // if (login.licenseKey == "") {
+    //   //License Key can't be Empty
+    //   await setLoading(false);
+    //   setLicenseError(true);
+    //   return;
+    // } else {
+    //   console.log("License resolved");
+    //   setLicenseError(false);
+    // }
+    // if (login.deviceName == "") {
+    //   //Device Name can't be empty as well
+    //   await setLoading(false);
+    //   setDeviceError(true);
+    //   return;
+    // } else {
+    //   console.log("Device name resolved");
+    //   setDeviceError(false);
+    // }
     Toast.show("Validation Successful");
     console.log("login body", login);
-    GetDeviceDetails();
+    //GetDeviceDetails();
+    PrepareLoginBody();
+  }
+
+  async function PrepareLoginBody() {
+    await setLogin({
+      ...login,
+      vendorId: "vendor123",
+    });
+    await setReady(true);
+  }
+
+  async function PerformDashboardLogin() {
+    if (isReady) {
+      console.log("calling dashboard login api");
+      await simpleLoginToShop(login)
+        .then((data) => {
+          console.log("dash login api data", data);
+          SaveCredentials(data);
+        })
+        .catch((error) => {
+          console.log("dashboard login error", error);
+          DropDownHolder.alert("error", "Failed to Login", error);
+          setLoading(false);
+          setReady(false);
+          return;
+        });
+    }
+  }
+
+  async function SaveCredentials(data) {
+    //TODO Save
+    //1. data.shop (Shop Data)
+    try {
+      await dispatch({ type: "UPDATE_SHOP_DETAILS", payload: data.metadata });
+      await realm.write(() => {
+        realm.create("Shop", data.metadata, true);
+      });
+    } catch (error) {
+      console.log("failed to save to realm", error);
+    }
+    //2. token (Auth token)
+    await SaveSession(data.token).catch((error) => {
+      console.log("couldn't save session to local", error);
+      setLoading(false);
+      return;
+    });
+    setLoading(false);
+    //TODO setAuthorization& navigate to Navigation Drawer
+    await setAuthorization(true);
+  }
+
+  async function SaveSession(token) {
+    const auth_token = ["@auth_token", token];
+    const session = ["@auth_session", JSON.stringify(true)];
+    try {
+      await AsyncStorage.multiSet([auth_token, session]);
+    } catch (error) {
+      console.log("failed to save session", error);
+    }
   }
 
   async function GetDeviceDetails() {
@@ -232,14 +282,14 @@ export default function Login() {
                   setLogin,
                   errorEmail,
                   errorPWD,
-                  errorLicense,
-                  errorDevice,
+                  //errorLicense,
+                  //errorDevice,
                   messageEmail,
                   messagePWD,
                 }}
               />
             ) : (
-              <View style={{ flex: 5 }}>
+              <View style={{ flex: 2.5 }}>
                 {/**For Content */}
                 <ScrollView
                   style={{ flex: 1 }}
@@ -251,8 +301,8 @@ export default function Login() {
                       setLogin,
                       errorEmail,
                       errorPWD,
-                      errorLicense,
-                      errorDevice,
+                      //errorLicense,
+                      //errorDevice,
                       messageEmail,
                       messagePWD,
                     }}
