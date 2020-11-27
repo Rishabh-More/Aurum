@@ -3,6 +3,8 @@ import { useStore } from "../../config/Store";
 import { useTheme } from "@react-navigation/native";
 import { useDeviceOrientation, useDimensions } from "@react-native-community/hooks";
 import { isPhone, isTablet } from "react-native-device-detection";
+import { responsive } from "../../config/ResponsiveConfig";
+import { responsiveFontSize as rf } from "react-native-responsive-dimensions";
 import { regenerateLinkOtp, expireCatalogueLink, shortShareableLink } from "../../api/ApiService";
 import { View, Text, StyleSheet, Share, Alert } from "react-native";
 import { Card, Title, Portal, Dialog } from "react-native-paper";
@@ -129,8 +131,13 @@ const CatalogueLinkItem = ({ link, columns }) => {
       ]}>
       <View style={styles.content}>
         <View style={styles.info}>
-          <Title style={{ marginTop: 10, marginStart: 10 }}>{link.name}</Title>
-          <Text style={{ margin: 10, color: colors.text }} numberOfLines={1}>
+          <Title
+            style={{ fontSize: rf(responsive.text.linkTitle), marginTop: 10, marginStart: 10 }}>
+            {link.name}
+          </Title>
+          <Text
+            style={{ fontSize: rf(responsive.text.linkText), margin: 10, color: colors.text }}
+            numberOfLines={1}>
             Link: {link.catalogueUrl}
           </Text>
           <View
@@ -149,7 +156,7 @@ const CatalogueLinkItem = ({ link, columns }) => {
                     flex: 1,
                     marginStart: 10,
                     marginEnd: 10,
-                    fontSize: 16,
+                    fontSize: rf(1.8),
                     fontWeight: "900",
                     color: colors.text,
                   }}>
@@ -157,6 +164,7 @@ const CatalogueLinkItem = ({ link, columns }) => {
                 </Text>
                 <Button
                   loading={generating}
+                  titleStyle={{ fontSize: rf(1.8) }}
                   buttonStyle={{ backgroundColor: colors.accent, borderRadius: 10 }}
                   containerStyle={{ width: isPhone ? 125 : 150, margin: 5, borderRadius: 10 }}
                   title="Regenerate OTP"
@@ -170,7 +178,11 @@ const CatalogueLinkItem = ({ link, columns }) => {
           <Button
             title="Share"
             type="outline"
-            titleStyle={{ marginStart: 5, color: colors.accent }}
+            titleStyle={{
+              fontSize: rf(responsive.text.linkButton),
+              marginStart: 5,
+              color: colors.accent,
+            }}
             icon={<Icon name="share-variant" size={20} color={colors.accent} />}
             buttonStyle={{
               borderColor: colors.accent,
@@ -184,7 +196,11 @@ const CatalogueLinkItem = ({ link, columns }) => {
             title="Expire Link"
             type="outline"
             loading={deleting}
-            titleStyle={{ marginStart: 5, color: colors.accent }}
+            titleStyle={{
+              fontSize: rf(responsive.text.linkButton),
+              marginStart: 5,
+              color: colors.accent,
+            }}
             loadingProps={{ color: colors.accent }}
             icon={<Icon name="trash-can-outline" size={20} color={colors.accent} />}
             buttonStyle={{
@@ -201,7 +217,8 @@ const CatalogueLinkItem = ({ link, columns }) => {
         <Dialog visible={shareDialog} style={{ borderRadius: 15 }} dismissable={false}>
           <Dialog.Content style={{ alignItems: "center" }}>
             <Fold size={30} color={colors.accent} />
-            <Text style={{ margin: 15, color: colors.text }}>
+            <Text
+              style={{ fontSize: rf(responsive.text.linkButton), margin: 15, color: colors.text }}>
               Please Wait, getting your link...
             </Text>
           </Dialog.Content>

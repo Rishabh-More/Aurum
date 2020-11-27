@@ -3,10 +3,14 @@ import DeviceInfo from "react-native-device-info";
 import { useStore } from "../config/Store";
 import { useDatabase } from "../config/Persistence";
 import { useAuthorization } from "./../navigation/Authorizer";
-import { useDeviceOrientation } from "@react-native-community/hooks";
+import { useDeviceOrientation, useDimensions } from "@react-native-community/hooks";
 import { useTheme, useNavigation } from "@react-navigation/native";
 import { isTablet } from "react-native-device-detection";
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import {
+  widthPercentageToDP as wp,
+  heightPercentageToDP as hp,
+} from "react-native-responsive-screen";
 import { simpleLoginToShop, generateLoginOTP } from "../api/ApiService";
 import {
   Platform,
@@ -29,6 +33,8 @@ export default function Login() {
   const realm = useDatabase();
   const navigation = useNavigation();
   const orientation = useDeviceOrientation();
+  const dimensions = useDimensions();
+  console.log("[LOGIN] changing window size:", dimensions.window, dimensions.screen);
   const { setAuthorization } = useAuthorization();
   const { colors, dark } = useTheme();
 
@@ -36,7 +42,7 @@ export default function Login() {
 
   const responsive = {
     parent: isTablet && orientation.landscape ? "row" : "column",
-    main: { flex: isTablet ? 1.5 : 1 },
+    main: { flex: isTablet ? 1.5 : 1.3 },
     header: { flex: isTablet ? 0 : 1, justifyContent: isTablet ? "center" : null },
     button: { flex: isTablet ? 0 : 1, justifyContent: isTablet ? "center" : null },
   };
@@ -258,68 +264,91 @@ export default function Login() {
           flexDirection: responsive.parent,
           backgroundColor: colors.accent,
         }}>
-        <View style={{ flex: 1, justifyContent: "center", alignItems: "center" }}>
-          <FastImage
-            style={styles.image}
-            source={require("../res/assets/main_logo.png")}
-            resizeMode={FastImage.resizeMode.cover}
-          />
-        </View>
-        <View style={{ flex: responsive.main.flex, justifyContent: "center" }}>
-          <View style={[styles.content, { backgroundColor: colors.primary }]}>
-            <View
-              style={{
-                flex: responsive.header.flex,
-                justifyContent: responsive.header.justifyContent,
-              }}>
-              {/**For Header */}
-              <LoginHeader />
-            </View>
-            {isTablet ? (
-              <LoginContent
-                {...{
-                  login,
-                  setLogin,
-                  errorEmail,
-                  errorPWD,
-                  //errorLicense,
-                  //errorDevice,
-                  messageEmail,
-                  messagePWD,
-                }}
+        {isTablet ? (
+          <View style={{ flex: 1 }}>
+            <View style={{ flex: 1, justifyContent: "center", alignItems: "center" }}>
+              <FastImage
+                style={styles.image}
+                source={require("../res/assets/main_logo.png")}
+                resizeMode={FastImage.resizeMode.cover}
               />
-            ) : (
-              <View style={{ flex: 2.5 }}>
-                {/**For Content */}
-                <ScrollView
-                  style={{ flex: 1 }}
-                  keyboardShouldPersistTaps="always"
-                  keyboardDismissMode="on-drag">
-                  <LoginContent
-                    {...{
-                      login,
-                      setLogin,
-                      errorEmail,
-                      errorPWD,
-                      //errorLicense,
-                      //errorDevice,
-                      messageEmail,
-                      messagePWD,
-                    }}
-                  />
-                </ScrollView>
+            </View>
+            <View style={{ flex: responsive.main.flex, justifyContent: "center" }}>
+              <View style={[styles.content, { backgroundColor: colors.primary }]}>
+                <View
+                  style={{
+                    flex: responsive.header.flex,
+                    justifyContent: responsive.header.justifyContent,
+                  }}>
+                  {/**For Header */}
+                  <LoginHeader />
+                </View>
+                <LoginContent
+                  {...{
+                    login,
+                    setLogin,
+                    errorEmail,
+                    errorPWD,
+                    //errorLicense,
+                    //errorDevice,
+                    messageEmail,
+                    messagePWD,
+                  }}
+                />
+                <View
+                  style={{
+                    flex: responsive.button.flex,
+                    justifyContent: responsive.button.justifyContent,
+                  }}>
+                  {/**For Footer */}
+                  <LoginFooter {...{ loading, VerifyInputs }} />
+                </View>
               </View>
-            )}
-            <View
-              style={{
-                flex: responsive.button.flex,
-                justifyContent: responsive.button.justifyContent,
-              }}>
-              {/**For Footer */}
-              <LoginFooter {...{ loading, VerifyInputs }} />
             </View>
           </View>
-        </View>
+        ) : (
+          <ScrollView style={{ flex: 1 }}>
+            <View style={{ flex: 1, justifyContent: "center", alignItems: "center" }}>
+              <FastImage
+                style={styles.image}
+                source={require("../res/assets/main_logo.png")}
+                resizeMode={FastImage.resizeMode.cover}
+              />
+            </View>
+            <View style={{ flex: responsive.main.flex, justifyContent: "center" }}>
+              <View style={[styles.content, { backgroundColor: colors.primary }]}>
+                <View
+                  style={{
+                    flex: responsive.header.flex,
+                    justifyContent: responsive.header.justifyContent,
+                  }}>
+                  {/**For Header */}
+                  <LoginHeader />
+                </View>
+                <LoginContent
+                  {...{
+                    login,
+                    setLogin,
+                    errorEmail,
+                    errorPWD,
+                    //errorLicense,
+                    //errorDevice,
+                    messageEmail,
+                    messagePWD,
+                  }}
+                />
+                <View
+                  style={{
+                    flex: responsive.button.flex,
+                    justifyContent: responsive.button.justifyContent,
+                  }}>
+                  {/**For Footer */}
+                  <LoginFooter {...{ loading, VerifyInputs }} />
+                </View>
+              </View>
+            </View>
+          </ScrollView>
+        )}
       </View>
     </SafeAreaView>
   );
@@ -337,7 +366,7 @@ const styles = StyleSheet.create({
     borderRadius: 25,
   },
   image: {
-    width: isTablet ? 500 : 300,
-    height: isTablet ? 500 : 300,
+    width: isTablet ? 500 : wp("70%"),
+    height: isTablet ? 500 : hp("40%"),
   },
 });

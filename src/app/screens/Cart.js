@@ -4,6 +4,8 @@ import { useDatabase } from "../config/Persistence";
 import { useTheme, useNavigation } from "@react-navigation/native";
 import { useDeviceOrientation, useDimensions } from "@react-native-community/hooks";
 import { isTablet, isPhone } from "react-native-device-detection";
+import { responsive } from "./../config/ResponsiveConfig";
+import { responsiveFontSize as rf } from "react-native-responsive-dimensions";
 import { SafeAreaView, View, Text, StyleSheet, FlatList, Alert } from "react-native";
 import CartOrderItem from "../components/pure components/CartOrderItem";
 import Icon from "react-native-vector-icons/MaterialCommunityIcons";
@@ -51,24 +53,29 @@ export default function Cart() {
 
   function RequestFeature() {
     if (state.data.cart.length != 0) {
-      Alert.alert("Checkout Method", `How would you like to checkout products from Cart?`, [
-        {
-          text: "Generate Order",
-          style: "default",
-          onPress: async () => {
-            await dispatch({ type: "SERVE_FEATURE_REQUEST", payload: "order" });
-            Toast.show("Checkout as Order");
+      Alert.alert(
+        "Checkout Method",
+        `How would you like to checkout products from Cart?`,
+        [
+          {
+            text: "Generate Order",
+            style: "default",
+            onPress: async () => {
+              await dispatch({ type: "SERVE_FEATURE_REQUEST", payload: "order" });
+              Toast.show("Checkout as Order");
+            },
           },
-        },
-        {
-          text: "Generate Link",
-          style: "destructive",
-          onPress: async () => {
-            await dispatch({ type: "SERVE_FEATURE_REQUEST", payload: "link" });
-            Toast.show("Checkout as Catalogue Link");
+          {
+            text: "Generate Link",
+            style: "destructive",
+            onPress: async () => {
+              await dispatch({ type: "SERVE_FEATURE_REQUEST", payload: "link" });
+              Toast.show("Checkout as Catalogue Link");
+            },
           },
-        },
-      ]);
+        ],
+        { cancelable: true }
+      );
     }
   }
   return (
@@ -97,14 +104,16 @@ export default function Cart() {
           ListEmptyComponent={
             state.data.cart.length == 0 ? (
               <View style={{ alignItems: "center" }}>
-                <Text style={{ color: "grey" }}>You currently have no items in your Cart</Text>
-                <Text style={{ color: colors.text, fontSize: 16 }}>
+                <Text style={{ fontSize: rf(responsive.text.cartText), color: "grey" }}>
+                  You currently have no items in your Cart
+                </Text>
+                <Text style={{ color: colors.text, fontSize: rf(responsive.text.cartText) }}>
                   Add items from Catalogue to show Here
                 </Text>
                 <Button
                   type="clear"
                   title="Products Catalogue"
-                  titleStyle={{ color: colors.accent }}
+                  titleStyle={{ fontSize: rf(responsive.text.cartTitle), color: colors.accent }}
                   onPress={() => navigation.navigate("catalogue")}
                 />
               </View>

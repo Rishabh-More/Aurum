@@ -4,6 +4,8 @@ import { isTablet } from "react-native-device-detection";
 import { View, StyleSheet, Text } from "react-native";
 import { TextInput, HelperText } from "react-native-paper";
 import { Button } from "react-native-elements";
+import { responsive } from "../config/ResponsiveConfig";
+import { responsiveFontSize as rf } from "react-native-responsive-dimensions";
 import Icon from "react-native-vector-icons/MaterialCommunityIcons";
 
 export function LoginContent(props) {
@@ -27,6 +29,7 @@ export function LoginContent(props) {
           <TextInput
             mode="outlined"
             label="Email"
+            style={{ fontSize: rf(responsive.text.loginContent) }}
             value={props.login.email}
             error={props.errorEmail}
             theme={InputTheme}
@@ -43,6 +46,7 @@ export function LoginContent(props) {
             <TextInput
               mode="outlined"
               label="Password"
+              style={{ fontSize: rf(responsive.text.loginContent) }}
               value={props.login.password}
               error={props.errorPWD}
               theme={InputTheme}

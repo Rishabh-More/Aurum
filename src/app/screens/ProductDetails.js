@@ -3,6 +3,8 @@ import { useStore } from "../config/Store";
 import { useTheme, useNavigation } from "@react-navigation/native";
 import { useDeviceOrientation, useDimensions } from "@react-native-community/hooks";
 import { isTablet, isPhone } from "react-native-device-detection";
+import { responsive } from "./../config/ResponsiveConfig";
+import { responsiveFontSize as rf } from "react-native-responsive-dimensions";
 import { StyleSheet, SafeAreaView, ScrollView, View, Text, TouchableOpacity } from "react-native";
 import { Card, Title, Subheading } from "react-native-paper";
 import { Button } from "react-native-elements";
@@ -56,8 +58,10 @@ export default function ProductDetails({ route }) {
   function Heading({ style, title, value }) {
     return (
       <View style={[{ flexDirection: "row", alignItems: "center", margin: 10 }, style]}>
-        <Subheading>{title} </Subheading>
-        <Title style={{ color: colors.accent }}>{value}</Title>
+        <Subheading style={{ fontSize: rf(responsive.text.detailsText) }}>{title} </Subheading>
+        <Title style={{ fontSize: rf(responsive.text.detailsTitle), color: colors.accent }}>
+          {value}
+        </Title>
       </View>
     );
   }
@@ -69,8 +73,10 @@ export default function ProductDetails({ route }) {
   function Info({ title, value }) {
     return (
       <View style={{ flexDirection: "row" }}>
-        <Subheading>{title} </Subheading>
-        <Subheading style={{ fontWeight: "bold" }}>{value != "" ? value : "N/A"}</Subheading>
+        <Subheading style={{ fontSize: rf(responsive.text.detailsText) }}>{title} </Subheading>
+        <Subheading style={{ fontSize: rf(responsive.text.detailsText), fontWeight: "bold" }}>
+          {value != "" ? value : "N/A"}
+        </Subheading>
       </View>
     );
   }
@@ -148,6 +154,7 @@ export default function ProductDetails({ route }) {
                 <Wrapper>
                   <Title
                     style={{
+                      fontSize: rf(responsive.text.detailsTitle),
                       color: colors.accent,
                       marginTop: 10,
                       marginBottom: 5,

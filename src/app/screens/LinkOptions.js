@@ -3,6 +3,8 @@ import { useStore } from "../config/Store";
 import { useDatabase } from "../config/Persistence";
 import { useNavigation, useTheme } from "@react-navigation/native";
 import { isPhone, isTablet } from "react-native-device-detection";
+import { responsive } from "./../config/ResponsiveConfig";
+import { responsiveFontSize as rf } from "react-native-responsive-dimensions";
 import { SafeAreaView, View, Text, StyleSheet, ScrollView } from "react-native";
 import DropDownPicker from "react-native-dropdown-picker";
 import ToggleSwitch from "toggle-switch-react-native";
@@ -90,6 +92,7 @@ export default function LinkOptions() {
         <Button
           title="Generate Link"
           loading={visible}
+          titleStyle={{ fontSize: rf(responsive.text.linkOptions) }}
           buttonStyle={{ backgroundColor: colors.accent, height: 50, borderRadius: 15 }}
           containerStyle={{ margin: 10 }}
           onPress={() => {
@@ -107,6 +110,7 @@ export default function LinkOptions() {
             <TextInput
               mode="outlined"
               label="Link Name (required)"
+              style={{ fontSize: rf(responsive.text.linkOptions) }}
               theme={{
                 colors: {
                   placeholder: colors.accent,
@@ -131,7 +135,7 @@ export default function LinkOptions() {
                 onColor={colors.accent}
                 size="medium"
                 label="Enable OTP?"
-                labelStyle={{ color: colors.text, fontSize: 16 }}
+                labelStyle={{ color: colors.text, fontSize: rf(responsive.text.linkOptions) }}
                 onToggle={() => {
                   let enable = link.otpEnabled == 1 ? 0 : 1;
                   console.log("enable is", enable);
@@ -150,7 +154,7 @@ export default function LinkOptions() {
                 marginTop: 10,
                 marginBottom: 10,
               }}>
-              <Text style={{ color: colors.text, fontSize: 16 }}>
+              <Text style={{ color: colors.text, fontSize: rf(responsive.text.linkOptions) }}>
                 OTP for generated link will expire in:{" "}
               </Text>
               <DropDownPicker
@@ -166,7 +170,7 @@ export default function LinkOptions() {
                 containerStyle={{ height: 50, flex: 1 }}
                 style={{ backgroundColor: colors.primary, borderColor: colors.border }}
                 dropDownStyle={{ backgroundColor: colors.primary, borderColor: colors.border }}
-                labelStyle={{ color: colors.text }}
+                labelStyle={{ fontSize: rf(responsive.text.linkOptions), color: colors.text }}
                 selectedLabelStyle={{ color: colors.text }}
                 activeItemStyle={{ backgroundColor: colors.accent }}
                 arrowColor={colors.text}

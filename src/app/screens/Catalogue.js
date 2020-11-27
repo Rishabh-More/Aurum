@@ -22,9 +22,17 @@ export default function Catalogue() {
   const { colors, dark } = useTheme();
   const realm = useDatabase();
   const overlay = useRef(true);
+  console.log("[CATALOGUE] screen dimensions are: ", dimensions);
 
-  const phoneColumns = isPhone && orientation.portrait ? 2 : 3;
-  const tabColumns = isTablet && orientation.portrait ? 3 : 4;
+  const smallScreenPhone = orientation.portrait ? 1 : 2;
+  const largeScreenPhone = orientation.portrait ? 2 : 3;
+
+  const responsivePhoneColumns =
+    isPhone && dimensions.screen.scale > 3 ? smallScreenPhone : largeScreenPhone; //isPhone && orientation.portrait ? 2 : 3;
+  const responsiveTabColumns = isTablet && orientation.portrait ? 3 : 4;
+
+  const numColumns = isPhone ? responsivePhoneColumns : responsiveTabColumns;
+  console.log("[CATALOGUE] numColumns is", numColumns);
 
   //State Codes
   const { state, dispatch } = useStore();
@@ -166,9 +174,9 @@ export default function Catalogue() {
         }}>
         <FlatList
           key={[orientation.landscape, orientation.portrait, state.data.products]}
-          numColumns={isPhone ? phoneColumns : tabColumns}
+          numColumns={numColumns}
           style={styles.flatlist}
-          columnWrapperStyle={styles.columns}
+          columnWrapperStyle={numColumns > 1 ? styles.columns : null}
           data={state.data.products}
           extraData={refresh}
           keyExtractor={(item) =>
@@ -176,9 +184,15 @@ export default function Catalogue() {
           }
           renderItem={({ item }) => {
             return state.indicators.isSortByGroup ? (
-              <GroupCatalogueItem design={item} columns={isPhone ? phoneColumns : tabColumns} />
+              <GroupCatalogueItem
+                design={item}
+                columns={isPhone ? responsivePhoneColumns : responsiveTabColumns}
+              />
             ) : (
-              <SingleCatalogueItem product={item} columns={isPhone ? phoneColumns : tabColumns} />
+              <SingleCatalogueItem
+                product={item}
+                columns={isPhone ? responsivePhoneColumns : responsiveTabColumns}
+              />
             );
           }}
           refreshing={isRefreshing}

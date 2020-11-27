@@ -4,6 +4,8 @@ import { useDatabase } from "../../config/Persistence";
 import { useTheme } from "@react-navigation/native";
 import { usePrevious } from "../../hooks/usePrevious";
 import { isPhone } from "react-native-device-detection";
+import { responsive } from "../../config/ResponsiveConfig";
+import { responsiveFontSize as rf } from "react-native-responsive-dimensions";
 import { View, Text, StyleSheet } from "react-native";
 import { Card, Title, TextInput } from "react-native-paper";
 import { Button } from "react-native-elements";
@@ -116,10 +118,14 @@ const CartOrderItem = ({ cart }) => {
           </View>
         </View>
         <View style={{ flex: 3 }}>
-          <View style={{ flexDirection: "row", alignItems: "flex-end", margin: 5 }}>
+          <View style={{ flexDirection: "row", alignItems: "center", margin: 5 }}>
             {/* <Title style={{ color: colors.accent }}>{cart.skuNumber}</Title> */}
-            <Text style={{ margin: 5, color: colors.text }}>Design Number: </Text>
-            <Title style={{ color: colors.accent }}>{cart.designNumber}</Title>
+            <Text style={{ fontSize: rf(responsive.text.cartText), margin: 5, color: colors.text }}>
+              Design Number:{" "}
+            </Text>
+            <Title style={{ fontSize: rf(responsive.text.cartTitle), color: colors.accent }}>
+              {cart.designNumber}
+            </Title>
           </View>
           <View style={{ flexDirection: "row", zIndex: 5 }}>
             <View
@@ -239,7 +245,7 @@ const CartOrderItem = ({ cart }) => {
               placeholder="Type some Remarks"
               value={props.orderProductRemarks}
               underlineColor={colors.accent}
-              style={{ flex: 1, borderRadius: 5 }}
+              style={{ flex: 1, borderRadius: 5, fontSize: rf(responsive.text.cartText) }}
               theme={{ colors: { primary: colors.accent, background: colors.card } }}
               onChangeText={(text) => {
                 setProps({ ...props, orderProductRemarks: text });

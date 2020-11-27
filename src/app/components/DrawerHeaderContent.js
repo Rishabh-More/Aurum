@@ -1,6 +1,8 @@
 import React from "react";
 import { View, StyleSheet } from "react-native";
 import { Avatar, Title, Caption } from "react-native-paper";
+import { responsive } from "../config/ResponsiveConfig";
+import { responsiveFontSize as rf } from "react-native-responsive-dimensions";
 
 export function DrawerHeaderContent({ theme, shop }) {
   const { colors } = theme;
@@ -38,12 +40,12 @@ const drawerHeader = StyleSheet.create({
     marginLeft: 15,
   },
   title: {
-    fontSize: 16,
+    fontSize: rf(responsive.text.drawerHeader),
     marginTop: 3,
     fontWeight: "bold",
   },
   caption: {
-    fontSize: 14,
+    fontSize: rf(responsive.text.drawerHeader),
     lineHeight: 14,
   },
 });

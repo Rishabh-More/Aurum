@@ -4,6 +4,12 @@ import { useStore } from "../../config/Store";
 import { useDatabase } from "../../config/Persistence";
 import { useDeviceOrientation, useDimensions } from "@react-native-community/hooks";
 import { useTheme, useNavigation } from "@react-navigation/native";
+import {
+  widthPercentageToDP as wp,
+  heightPercentageToDP as hp,
+} from "react-native-responsive-screen";
+import { responsive } from "../../config/ResponsiveConfig";
+import { responsiveFontSize as rf } from "react-native-responsive-dimensions";
 import { StyleSheet, View, Text, TouchableOpacity } from "react-native";
 import { Card, Title } from "react-native-paper";
 import { Button } from "react-native-elements";
@@ -98,7 +104,7 @@ const SingleCatalogueItem = ({ product, columns }) => {
                 flexDirection: "row",
                 justifyContent: "space-evenly",
               }}>
-              <Text style={[styles.text, { flex: 1, color: colors.textSubtle }]}>
+              <Text style={[styles.text, { flex: 2, color: colors.textSubtle }]}>
                 <Text style={{ fontWeight: "bold" }}>G Wt: </Text>
                 {product.grossWeight}
               </Text>
@@ -111,7 +117,7 @@ const SingleCatalogueItem = ({ product, columns }) => {
                 flexDirection: "row",
                 justifyContent: "space-evenly",
               }}>
-              <Text style={[styles.text, { flex: 1, color: colors.textSubtle }]}>
+              <Text style={[styles.text, { flex: 2, color: colors.textSubtle }]}>
                 <Text style={{ fontWeight: "bold" }}>N Wt: </Text>
                 {product.netWeight}
               </Text>
@@ -166,12 +172,14 @@ const styles = StyleSheet.create({
     flexDirection: "row",
   },
   title: {
+    fontSize: rf(responsive.text.catalogueTitle),
     marginStart: 10,
     marginEnd: 10,
   },
   text: {
     //flex: 1,
     marginLeft: 5,
+    fontSize: rf(responsive.text.catalogueText),
   },
   image: {
     margin: 3,

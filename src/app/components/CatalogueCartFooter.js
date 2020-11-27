@@ -2,6 +2,8 @@ import React, { useState } from "react";
 import { useStore } from "../config/Store";
 import { useDatabase } from "../config/Persistence";
 import { useTheme, useNavigation } from "@react-navigation/native";
+import { responsive } from "../config/ResponsiveConfig";
+import { responsiveFontSize as rf } from "react-native-responsive-dimensions";
 import { View, Text } from "react-native";
 import { Title } from "react-native-paper";
 import { Button, Overlay } from "react-native-elements";
@@ -36,8 +38,13 @@ export function CatalogueCartFooter() {
         justifyContent: "flex-end",
         alignItems: "center",
       }}>
-      <View style={{ flex: 4, alignItems: "center" }}>
-        <Text style={{ fontSize: 18, fontWeight: "600", color: "#fff" }}>
+      <View style={{ flex: 3, alignItems: "center" }}>
+        <Text
+          style={{
+            fontSize: rf(responsive.text.catalogueFooter),
+            fontWeight: "600",
+            color: "#fff",
+          }}>
           Items Added to Cart: {state.data.cart.length}
         </Text>
       </View>
@@ -57,6 +64,7 @@ export function CatalogueCartFooter() {
         <Button
           title="Checkout"
           ViewComponent={LinearGradient}
+          titleStyle={{ fontSize: rf(responsive.text.catalogueFooter) }}
           containerStyle={{
             flex: 1,
             margin: 10,
