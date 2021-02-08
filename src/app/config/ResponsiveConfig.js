@@ -21,7 +21,7 @@ export const responsive = {
   text: {
     loginHeaderTitle: 2,
     loginHeaderText: 1.8,
-    loginContent: 1.8,
+    loginContent: 1.4,
     loginFooter: 2,
     drawerHeader: 1.6,
     catalogueTitle: 2,

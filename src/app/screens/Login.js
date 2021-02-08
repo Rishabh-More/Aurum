@@ -47,7 +47,7 @@ export default function Login() {
     button: { flex: isTablet ? 0 : 1, justifyContent: isTablet ? "center" : null },
   };
 
-  console.log("responsive parent orientation", orientation.landscape, responsive.parent);
+  console.log("responsive parent orientation", orientation.landscape, isTablet);
 
   /** State Codes */
   //States
@@ -265,7 +265,7 @@ export default function Login() {
           backgroundColor: colors.accent,
         }}>
         {isTablet ? (
-          <View style={{ flex: 1 }}>
+          <View style={{ flex: 1, flexDirection: responsive.parent }}>
             <View style={{ flex: 1, justifyContent: "center", alignItems: "center" }}>
               <FastImage
                 style={styles.image}
@@ -366,7 +366,7 @@ const styles = StyleSheet.create({
     borderRadius: 25,
   },
   image: {
-    width: isTablet ? 500 : wp("70%"),
-    height: isTablet ? 500 : hp("40%"),
+    width: isTablet ? wp("40%") : wp("70%"),
+    height: isTablet ? hp("40%") : hp("40%"),
   },
 });

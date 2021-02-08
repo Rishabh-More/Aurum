@@ -25,6 +25,9 @@ const SingleCatalogueItem = ({ product, columns }) => {
   const realm = useDatabase();
   const { colors, dark } = useTheme();
 
+  const responsivePhoneAspect = orientation.portrait ? 1 : 1;
+  const responsiveTabletAspect = orientation.portrait ? 5 : 1;
+
   //State Code
   const { state, dispatch } = useStore();
   const [visible, setIsVisible] = useState(false);
@@ -71,12 +74,11 @@ const SingleCatalogueItem = ({ product, columns }) => {
     <Card
       style={[
         styles.container,
-        isPhone
-          ? { aspectRatio: orientation.portrait ? 1 : 1 }
-          : { aspectRatio: orientation.portrait ? 1.3 : 1.5 },
+        isPhone ? { aspectRatio: responsivePhoneAspect } : { aspectRatio: responsiveTabletAspect },
         { width: dimensions.screen.width / columns - 2 * 5 }, // Compensated width with margin 2 * margin
       ]}
-      onPress={() => navigation.navigate("details", product)}>
+      onPress={() => navigation.navigate("details", product)}
+    >
       <TouchableOpacity style={{ flex: 2 }} onPress={() => setIsVisible(true)}>
         <FastImage
           style={styles.image}
@@ -103,7 +105,8 @@ const SingleCatalogueItem = ({ product, columns }) => {
               style={{
                 flexDirection: "row",
                 justifyContent: "space-evenly",
-              }}>
+              }}
+            >
               <Text style={[styles.text, { flex: 2, color: colors.textSubtle }]}>
                 <Text style={{ fontWeight: "bold" }}>G Wt: </Text>
                 {product.grossWeight}
@@ -116,7 +119,8 @@ const SingleCatalogueItem = ({ product, columns }) => {
               style={{
                 flexDirection: "row",
                 justifyContent: "space-evenly",
-              }}>
+              }}
+            >
               <Text style={[styles.text, { flex: 2, color: colors.textSubtle }]}>
                 <Text style={{ fontWeight: "bold" }}>N Wt: </Text>
                 {product.netWeight}

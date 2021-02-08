@@ -24,64 +24,117 @@ export function LoginContent(props) {
   return (
     <View style={{ margin: "3%" }}>
       {/**Login & Email Wrapper */}
-      <View style={{ flexDirection: isTablet ? "row" : "column" }}>
-        <View style={styles.input}>
-          <TextInput
-            mode="outlined"
-            label="Email"
-            style={{ fontSize: rf(responsive.text.loginContent) }}
-            value={props.login.email}
-            error={props.errorEmail}
-            theme={InputTheme}
-            onChangeText={(text) => props.setLogin({ ...props.login, email: text })}
+      {isTablet ? (
+        <View style={{ flexDirection: "row", alignItems: "center" }}>
+          <View style={{ flex: 1, flexDirection: "row" }}>
+            <View style={styles.input}>
+              <TextInput
+                mode="outlined"
+                label="Email"
+                style={{ fontSize: rf(responsive.text.loginContent) }}
+                value={props.login.email}
+                error={props.errorEmail}
+                theme={InputTheme}
+                onChangeText={(text) => props.setLogin({ ...props.login, email: text })}
+              />
+              {props.errorEmail ? (
+                <HelperText visible={true} type="error" theme={{ colors: { error: "red" } }}>
+                  {props.messageEmail}
+                </HelperText>
+              ) : null}
+            </View>
+            <View style={styles.input}>
+              <TextInput
+                mode="outlined"
+                label="Password"
+                style={{ fontSize: rf(responsive.text.loginContent) }}
+                value={props.login.password}
+                error={props.errorPWD}
+                theme={InputTheme}
+                secureTextEntry={secureEntry}
+                style={{ flex: 1, marginBottom: 5, marginEnd: isTablet ? 0 : 5 }}
+                onChangeText={(text) => props.setLogin({ ...props.login, password: text })}
+              />
+              {props.errorPWD ? (
+                <HelperText visible={true} type="error" theme={{ colors: { error: "red" } }}>
+                  {props.messagePWD}
+                </HelperText>
+              ) : null}
+            </View>
+          </View>
+          <Button
+            icon={<Icon name={secureEntry ? "eye-off-outline" : "eye-outline"} size={24} color={colors.accent} />}
+            type="outline"
+            buttonStyle={{
+              width: 55,
+              aspectRatio: 1,
+              backgroundColor: colors.background,
+              borderColor: colors.accent,
+              borderWidth: 1,
+              borderRadius: 10,
+            }}
+            containerStyle={{ marginStart: 5 }}
+            onPress={async () => setSecureEntry(!secureEntry)}
           />
-          {props.errorEmail ? (
-            <HelperText visible={true} type="error" theme={{ colors: { error: "red" } }}>
-              {props.messageEmail}
-            </HelperText>
-          ) : null}
         </View>
-        <View style={styles.input}>
-          <View style={{ flexDirection: "row", alignItems: "center" }}>
+      ) : (
+        <View style={{ flexDirection: "column" }}>
+          <View style={styles.input}>
             <TextInput
               mode="outlined"
-              label="Password"
+              label="Email"
               style={{ fontSize: rf(responsive.text.loginContent) }}
-              value={props.login.password}
-              error={props.errorPWD}
+              value={props.login.email}
+              error={props.errorEmail}
               theme={InputTheme}
-              secureTextEntry={secureEntry}
-              style={{ flex: 1, marginBottom: 5, marginEnd: isTablet ? 15 : 5 }}
-              onChangeText={(text) => props.setLogin({ ...props.login, password: text })}
+              onChangeText={(text) => props.setLogin({ ...props.login, email: text })}
             />
-            <Button
-              icon={
-                <Icon
-                  name={secureEntry ? "eye-off-outline" : "eye-outline"}
-                  size={24}
-                  color={colors.accent}
-                />
-              }
-              type="outline"
-              buttonStyle={{
-                width: 55,
-                aspectRatio: 1,
-                backgroundColor: colors.background,
-                borderColor: colors.accent,
-                borderWidth: 1,
-                borderRadius: 10,
-              }}
-              containerStyle={{ marginStart: 5 }}
-              onPress={async () => setSecureEntry(!secureEntry)}
-            />
+            {props.errorEmail ? (
+              <HelperText visible={true} type="error" theme={{ colors: { error: "red" } }}>
+                {props.messageEmail}
+              </HelperText>
+            ) : null}
           </View>
-          {props.errorPWD ? (
-            <HelperText visible={true} type="error" theme={{ colors: { error: "red" } }}>
-              {props.messagePWD}
-            </HelperText>
-          ) : null}
+          <View style={styles.input}>
+            <View style={{ flexDirection: "row", alignItems: "center" }}>
+              <TextInput
+                mode="outlined"
+                label="Password"
+                style={{ fontSize: rf(responsive.text.loginContent) }}
+                value={props.login.password}
+                error={props.errorPWD}
+                theme={InputTheme}
+                secureTextEntry={secureEntry}
+                style={{
+                  flex: 1,
+                  marginBottom: 5,
+                  marginEnd: isTablet ? 15 : 5,
+                }}
+                onChangeText={(text) => props.setLogin({ ...props.login, password: text })}
+              />
+              <Button
+                icon={<Icon name={secureEntry ? "eye-off-outline" : "eye-outline"} size={24} color={colors.accent} />}
+                type="outline"
+                buttonStyle={{
+                  width: 55,
+                  aspectRatio: 1,
+                  backgroundColor: colors.background,
+                  borderColor: colors.accent,
+                  borderWidth: 1,
+                  borderRadius: 10,
+                }}
+                containerStyle={{ marginStart: 5 }}
+                onPress={async () => setSecureEntry(!secureEntry)}
+              />
+            </View>
+            {props.errorPWD ? (
+              <HelperText visible={true} type="error" theme={{ colors: { error: "red" } }}>
+                {props.messagePWD}
+              </HelperText>
+            ) : null}
+          </View>
         </View>
-      </View>
+      )}
       {/**License & Device Wrapper */}
       {/* <View style={{ flexDirection: isTablet ? "row" : "column", backgroundColor: "blue" }}>
         <View style={styles.input}>
@@ -122,8 +175,7 @@ export function LoginContent(props) {
 const styles = StyleSheet.create({
   input: {
     flex: 1,
-    margin: 5,
-    marginStart: isTablet ? 20 : 10,
-    marginEnd: isTablet ? 20 : 10,
+    marginStart: isTablet ? 5 : 10,
+    marginEnd: isTablet ? 5 : 10,
   },
 });

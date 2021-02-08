@@ -42,11 +42,14 @@ export default function Catalogue() {
   const [isRefreshing, setRefreshing] = useState(false);
 
   useEffect(() => {
+    const event = new Date();
     console.log("[CATALOGUE] State object", state);
+    console.log("Api called at: ", event.toLocaleTimeString());
     getProductsFromShop(state.shop.id)
       .then((data) => {
-        console.log("api response", data);
+        //console.log("api response", data);
         dispatch({ type: "SET_PRODUCTS", payload: data });
+        console.log("Api response received at: ", event.toLocaleTimeString());
         overlay.current = !overlay.current;
         //Check for Saved Cart items
         CheckSavedCart();
@@ -171,7 +174,8 @@ export default function Catalogue() {
           backgroundColor: colors.background,
           borderBottomLeftRadius: state.data.cart.length != 0 ? 30 : 0,
           borderBottomRightRadius: state.data.cart.length != 0 ? 30 : 0,
-        }}>
+        }}
+      >
         <FlatList
           key={[orientation.landscape, orientation.portrait, state.data.products]}
           numColumns={numColumns}
@@ -210,14 +214,16 @@ export default function Catalogue() {
               height: "100%",
               flex: 1,
               position: "absolute",
-            }}>
+            }}
+          >
             <View
               style={{
                 flex: 1,
                 position: "absolute",
                 width: "100%",
                 height: "100%",
-              }}>
+              }}
+            >
               <View
                 style={{
                   flex: 1,
@@ -240,7 +246,8 @@ export default function Catalogue() {
                   opacity: 1,
                   alignItems: "center",
                   justifyContent: "center",
-                }}>
+                }}
+              >
                 <Text style={{ color: colors.text }}>Please Wait, Updating List...</Text>
                 <BarIndicator size={30} count={5} color={colors.accent} style={{ maxHeight: 75 }} />
               </View>
