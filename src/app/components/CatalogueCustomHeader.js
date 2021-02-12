@@ -1,14 +1,17 @@
 import React from "react";
 import { useStore } from "../config/Store";
+import { useDatabase } from "../config/Persistence";
 import { useTheme, useNavigation } from "@react-navigation/native";
 //import useSortFilter from "../hooks/useSortFilter";
 import { View, Text, StyleSheet, StatusBar } from "react-native";
 import { Searchbar } from "react-native-paper";
 import { Badge } from "react-native-elements";
-import { ButtonGroup } from "react-native-elements";
+import { ButtonGroup, Button } from "react-native-elements";
+import Toast from "react-native-simple-toast";
 import Icon from "react-native-vector-icons/MaterialCommunityIcons";
 
 export function CatalogueCustomHeader() {
+  const realm = useDatabase();
   const { colors, dark } = useTheme();
   const navigation = useNavigation();
   const { state, dispatch } = useStore();
@@ -33,6 +36,49 @@ export function CatalogueCustomHeader() {
     await dispatch({ type: "SEARCH_PRODUCTS", payload: result });
   };
 
+  const AddAlltoSelection = async () => {
+    if (state.data.catalogue.length != 0 && state.data.products.length != 0) {
+      await dispatch({ type: "SET_SELECTION", payload: state.data.products });
+      await dispatch({ type: "SET_SELECTION_FLAG", payload: true });
+    }
+  };
+
+  const RemoveAllFromSelection = async () => {
+    await dispatch({ type: "CLEAR_SELECTION" });
+    await dispatch({ type: "SET_SELECTION_FLAG", payload: false });
+  };
+
+  const AddAllSelectedToCart = async () => {
+    if (state.data.selection.length != 0) {
+      //Step 1: Remove all bad props from selected items.
+      const cleanedList = state.data.selection.map(
+        ({ shopId, createdAt, updatedAt, ...rest }) => rest
+      );
+      console.log("Cleaned Selection List", cleanedList);
+      //Step 2: Add props for order in cart
+      const formattedList = cleanedList.map((values) => ({
+        ...values,
+        orderProductQuantity: 1,
+        orderProductRemarks: "",
+      }));
+      console.log("Formatted Selection List", formattedList);
+      try {
+        //Step 3: Save All to Realm
+        await realm.write(() => {
+          realm.create("Cart", cleanedList);
+        });
+        //Step 4: Dispatch to Redux
+        await dispatch({ type: "ADD_ALL_TO_CART", payload: formattedList });
+      } catch (error) {
+        Toast.show("Failed to Add to Cart");
+        console.log("Failed to save to realm", error);
+      }
+      await RemoveAllFromSelection();
+    } else {
+      Toast.show("No products selected!");
+    }
+  };
+
   return (
     <View style={styles.parentContainer}>
       <StatusBar
@@ -53,7 +99,8 @@ export function CatalogueCustomHeader() {
                 fontSize: 16,
                 color: colors.text,
                 fontWeight: "bold",
-              }}>
+              }}
+            >
               Catalogue
             </Text>
           </View>
@@ -78,6 +125,39 @@ export function CatalogueCustomHeader() {
               }
             }}
           /> */}
+          <Text
+            style={{
+              fontSize: 16,
+              color: colors.text,
+              fontWeight: "bold",
+              marginEnd: 5,
+            }}
+          >
+            Selected: {state.data.selection.length != 0 ? state.data.selection.length : "None"}
+          </Text>
+          <Button
+            type={state.data.selection.length != 0 ? "solid" : "outline"}
+            containerStyle={{ marginStart: 5, marginEnd: 5 }}
+            buttonStyle={{
+              borderRadius: 10,
+              backgroundColor: state.data.selection.length != 0 ? colors.accent : "transparent",
+              borderColor: colors.accent,
+            }}
+            titleStyle={{
+              color: state.data.selection.length != 0 ? colors.textInverse : colors.accent,
+            }}
+            title={state.data.selection.length != 0 ? "Deselect All" : "Select All"}
+            onPress={() =>
+              state.data.selection.length == 0 ? AddAlltoSelection() : RemoveAllFromSelection()
+            }
+          />
+          <Button
+            type="outline"
+            containerStyle={{ marginStart: 5, marginEnd: 5 }}
+            buttonStyle={{ borderRadius: 25, borderColor: colors.primary }}
+            icon={<Icon name="cart-arrow-down" size={25} color={colors.accent} />}
+            onPress={() => AddAllSelectedToCart()}
+          />
           <Icon
             name={state.indicators.isFilterApplied ? "filter" : "filter-outline"}
             size={30}

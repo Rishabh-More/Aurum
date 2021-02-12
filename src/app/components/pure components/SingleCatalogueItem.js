@@ -11,6 +11,7 @@ import {
 import { responsive } from "../../config/ResponsiveConfig";
 import { responsiveFontSize as rf } from "react-native-responsive-dimensions";
 import { StyleSheet, View, Text, TouchableOpacity } from "react-native";
+import CheckBox from "react-native-check-box";
 import { Card, Title } from "react-native-paper";
 import { Button } from "react-native-elements";
 import FastImage from "react-native-fast-image";
@@ -31,6 +32,7 @@ const SingleCatalogueItem = ({ product, columns }) => {
   //State Code
   const { state, dispatch } = useStore();
   const [visible, setIsVisible] = useState(false);
+  const [selected, setSelected] = useState(false);
   const [added, setAdded] = useState(false);
 
   useEffect(() => {
@@ -42,6 +44,24 @@ const SingleCatalogueItem = ({ product, columns }) => {
       setAdded(false);
     }
   }, [state.data.cart.length]);
+
+  useEffect(() => {
+    ValidateItemSelection(selected);
+  }, [selected]);
+
+  useEffect(() => {
+    if (state.indicators.areProductsSelected) {
+      console.log("Checking true");
+      setSelected(true);
+    } else {
+      console.log("Checking false");
+      setSelected(false);
+    }
+  }, [state.indicators.areProductsSelected]);
+
+  useEffect(() => {
+    console.log("[REDUX] Selection is", state.data.selection.length);
+  }, [state.data.selection]);
 
   async function AddProductToCart() {
     const { shopId, createdAt, updatedAt, ...rest } = product;
@@ -70,6 +90,26 @@ const SingleCatalogueItem = ({ product, columns }) => {
     }
   }
 
+  async function ValidateItemSelection(selectionValue) {
+    let existsInSelection = await state.data.selection.find(
+      (item) => item.skuNumber == product.skuNumber
+    );
+    console.log("Exists in Selection: ", existsInSelection);
+    //If Checkbox is selected & item doesn't exist in array
+    //Add to selection array
+    if (selectionValue == true && existsInSelection == null) {
+      console.log("Adding Item from Adapter");
+      await dispatch({ type: "ADD_TO_SELECTION", payload: product });
+    }
+    //If Checkbox is deselected but item exists in array
+    //Remove from Selection
+    else if (selectionValue == false && existsInSelection != null) {
+      console.log("Removing Item from Adapter");
+      let index = state.data.selection.indexOf(product);
+      await dispatch({ type: "REMOVE_SELECTION", payload: index });
+    }
+  }
+
   return (
     <Card
       style={[
@@ -78,7 +118,26 @@ const SingleCatalogueItem = ({ product, columns }) => {
         { width: dimensions.screen.width / columns - 2 * 5 }, // Compensated width with margin 2 * margin
       ]}
       onPress={() => navigation.navigate("details", product)}
+      //onLongPress={} //TODO Select the car item here
     >
+      <View
+        style={{
+          alignSelf: "baseline" && "flex-end",
+          borderTopRightRadius: 10,
+          borderBottomLeftRadius: 10,
+          backgroundColor: colors.accentLightTransparent,
+          position: "absolute",
+          zIndex: 2,
+        }}
+      >
+        <CheckBox
+          style={{ margin: 10 }}
+          checkBoxColor={colors.accentLight}
+          checkedCheckBoxColor={colors.accentLight}
+          isChecked={selected}
+          onClick={() => setSelected(!selected)}
+        />
+      </View>
       <TouchableOpacity style={{ flex: 2 }} onPress={() => setIsVisible(true)}>
         <FastImage
           style={styles.image}

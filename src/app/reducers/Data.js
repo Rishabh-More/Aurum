@@ -1,5 +1,6 @@
 const initialData = {
   catalogue: [],
+  selection: [],
   products: [],
   designs: [],
   filter: [],
@@ -24,6 +25,20 @@ const dataReducer = (state, action) => {
       return { ...state, filter: action.payload };
     case "CLEAR_FILTER":
       return { ...state, filter: [] };
+    case "SET_SELECTION":
+      return { ...state, selection: action.payload };
+    case "ADD_TO_SELECTION":
+      return { ...state, selection: [...state.selection, action.payload] };
+    case "REMOVE_SELECTION":
+      return {
+        ...state,
+        selection: [
+          ...state.selection.slice(0, action.payload),
+          ...state.selection.slice(action.payload + 1),
+        ],
+      };
+    case "CLEAR_SELECTION":
+      return { ...state, selection: [] };
     case "ADD_TO_CART":
       return { ...state, cart: [...state.cart, action.payload] };
     case "ADD_ALL_TO_CART":

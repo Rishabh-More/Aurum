@@ -1,4 +1,5 @@
 const initialIndicators = {
+  areProductsSelected: false,
   dataRefreshed: false,
   linksRefreshed: false,
   isSortByGroup: false,
@@ -8,6 +9,8 @@ const initialIndicators = {
 
 const indicatorReducer = (state, action) => {
   switch (action.type) {
+    case "SET_SELECTION_FLAG":
+      return { ...state, areProductsSelected: action.payload };
     case "SET_SORT_FLAG":
       return { ...state, isSortByGroup: action.payload };
     case "SET_FILTER_FLAG":

@@ -3,7 +3,9 @@ import { DefaultTheme as PaperDefaultTheme, DarkTheme as PaperDarkTheme } from "
 const Colors = {
   accent: "rgb(232, 30, 98)", //"rgb(255, 152, 0)",
   accentLight: "rgb(255, 96, 143)", //"rgb(255, 201, 71)",
+  accentLightTransparent: "rgba(255, 96, 143, 0.1)",
   accentDark: "rgb(175, 0, 57)", //"rgb(198, 105, 0)",
+  accentDarkTransparent: "rgba(175, 0, 57, 0.1)",
 };
 
 const AppDefaultTheme = {
@@ -15,7 +17,9 @@ const AppDefaultTheme = {
     primary: "rgb(255, 255, 255)",
     accent: Colors.accent,
     accentDark: Colors.accentDark,
+    accentDarkTransparent: Colors.accentDarkTransparent,
     accentLight: Colors.accentLight,
+    accentLightTransparent: Colors.accentLightTransparent,
     statusBar: "rgb(232, 232, 232)",
     background: "rgb(245, 245, 240)",
     card: "rgb(255, 255, 255)",
@@ -38,7 +42,9 @@ const AppDarkTheme = {
     primary: "rgb(36, 36, 36)",
     accent: Colors.accent,
     accentDark: Colors.accentDark,
+    accentDarkTransparent: Colors.accentDarkTransparent,
     accentLight: Colors.accentLight,
+    accentLightTransparent: Colors.accentLightTransparent,
     statusBar: "rgb(18, 18, 18)",
     background: "rgb(18, 18, 18)",
     card: "rgb(30, 30, 30)",
