@@ -1,4 +1,5 @@
 import React from "react";
+import { StackActions } from "@react-navigation/native";
 import {
   createStackNavigator,
   CardStyleInterpolators,
@@ -14,7 +15,8 @@ const CartStack = createStackNavigator();
 
 const CartStacks = () => (
   <CartStack.Navigator
-    screenOptions={{ cardStyleInterpolator: CardStyleInterpolators.forHorizontalIOS }}>
+    screenOptions={{ cardStyleInterpolator: CardStyleInterpolators.forHorizontalIOS }}
+  >
     <CartStack.Screen name="cart" component={Cart} options={{ headerShown: false }} />
     <CartStack.Screen
       name="customers"
@@ -31,7 +33,14 @@ const CartStacks = () => (
       component={Success}
       options={({ navigation }) => ({
         headerTitle: "Generated Successfully",
-        headerLeft: () => <HeaderBackButton onPress={() => navigation.navigate("cart")} />,
+        headerLeft: () => (
+          <HeaderBackButton
+            onPress={() => {
+              navigation.dispatch(StackActions.popToTop());
+              navigation.navigate("home-catalogue");
+            }}
+          />
+        ),
       })}
     />
   </CartStack.Navigator>

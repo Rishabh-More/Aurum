@@ -5,6 +5,7 @@ const initialIndicators = {
   isSortByGroup: false,
   isFilterApplied: false,
   requestedFeature: "",
+  isCartVisited: false,
 };
 
 const indicatorReducer = (state, action) => {
@@ -23,7 +24,13 @@ const indicatorReducer = (state, action) => {
       return { ...state, requestedFeature: action.payload };
     case "CLEAR_FEATURE_REQUEST":
       return { ...state, requestedFeature: "" };
+    case "SET_CART_CLICKED":
+      console.log("last visited payload:", action.payload);
+      return { ...state, isCartVisited: action.payload };
+    case "CLEAR_CART_CLICKED":
+      return { ...state, isCartVisited: false };
     default:
+      console.log("[INDICATOR] default state returned");
       return state;
   }
 };

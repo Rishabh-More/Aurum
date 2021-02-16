@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { useNavigation, useTheme } from "@react-navigation/native";
+import { useNavigation, useTheme, StackActions } from "@react-navigation/native";
 import { useDeviceOrientation } from "@react-native-community/hooks";
 import { isPhone, isTablet } from "react-native-device-detection";
 import { responsiveFontSize as rf } from "react-native-responsive-dimensions";
@@ -67,7 +67,8 @@ export default function LinkSuccess({ success }) {
             marginTop: 15,
             marginBottom: 15,
             margin: 10,
-          }}>
+          }}
+        >
           <Subheading style={{ fontSize: rf(responsive.text.linkSuccessText) }}>
             Link Name: {success.name}
           </Subheading>
@@ -105,7 +106,10 @@ export default function LinkSuccess({ success }) {
           title="View Catalogue Links"
           titleStyle={{ fontSize: rf(responsive.text.linkSuccessButton), color: colors.accent }}
           buttonStyle={{ marginTop: 10, marginBottom: 10 }}
-          onPress={() => navigation.navigate("Links")}
+          onPress={() => {
+            navigation.dispatch(StackActions.popToTop());
+            navigation.navigate("Links");
+          }}
         />
       </View>
     </SafeAreaView>

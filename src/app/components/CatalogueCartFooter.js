@@ -1,7 +1,7 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { useStore } from "../config/Store";
 import { useDatabase } from "../config/Persistence";
-import { useTheme, useNavigation } from "@react-navigation/native";
+import { useTheme, useNavigation, NavigationAction, CommonActions } from "@react-navigation/native";
 import { responsive } from "../config/ResponsiveConfig";
 import { responsiveFontSize as rf } from "react-native-responsive-dimensions";
 import { View, Text } from "react-native";
@@ -19,6 +19,12 @@ export function CatalogueCartFooter() {
   const { state, dispatch } = useStore();
   const [visible, setVisible] = useState(false);
 
+  useEffect(() => {
+    if (state.indicators.isCartVisited) {
+      setVisible(true);
+    }
+  }, [state.indicators.isCartVisited]);
+
   async function ClearCartItems() {
     try {
       await realm.write(() => {
@@ -31,20 +37,29 @@ export function CatalogueCartFooter() {
     }
   }
 
+  async function NavigateToCart() {
+    await dispatch({ type: "SET_LAST_VISITED", payload: "cart" });
+    //await dispatch({ type: "SERVE_FEATURE_REQUEST", payload: "link" });
+    setVisible(false);
+    navigation.navigate("Cart", { last_screen: "cart" });
+  }
+
   return (
     <View
       style={{
         flexDirection: "row",
         justifyContent: "flex-end",
         alignItems: "center",
-      }}>
+      }}
+    >
       <View style={{ flex: 3, alignItems: "center" }}>
         <Text
           style={{
             fontSize: rf(responsive.text.catalogueFooter),
             fontWeight: "600",
             color: "#fff",
-          }}>
+          }}
+        >
           Items Added to Cart: {state.data.cart.length}
         </Text>
       </View>
@@ -55,7 +70,8 @@ export function CatalogueCartFooter() {
           alignItems: "center",
           marginTop: 10,
           marginBottom: 10,
-        }}>
+        }}
+      >
         <Button
           icon={<Icon name="delete-sweep-outline" size={24} color={colors.accent} />}
           buttonStyle={{ height: 50, width: 50, backgroundColor: "#fff", borderRadius: 25 }}
@@ -78,14 +94,19 @@ export function CatalogueCartFooter() {
             start: { x: 1, y: 1 },
             end: { x: 1, y: 0 },
           }}
-          onPress={() => navigation.navigate("Cart")}
+          onPress={() => {
+            setVisible(true);
+            console.log("Called");
+            //navigation.navigate("Cart");
+          }}
         />
       </View>
       <Overlay
         title="Select Action"
         isVisible={visible}
         overlayStyle={{ borderRadius: 15, backgroundColor: colors.modal }}
-        onBackdropPress={() => setVisible(false)}>
+        onBackdropPress={() => setVisible(false)}
+      >
         <View style={{ margin: 5 }}>
           <View style={{ flexDirection: "row", alignItems: "center" }}>
             <Icon name="cart-outline" size={24} color={colors.accent} style={{ marginStart: 5 }} />
@@ -100,7 +121,8 @@ export function CatalogueCartFooter() {
               marginTop: 5,
               marginBottom: 5,
               color: colors.text,
-            }}>
+            }}
+          >
             How would you like to checkout to Cart?
           </Text>
           <View style={{ flexDirection: "row" }}>
@@ -126,8 +148,9 @@ export function CatalogueCartFooter() {
               title="Generate Order"
               onPress={async () => {
                 await dispatch({ type: "SERVE_FEATURE_REQUEST", payload: "order" });
+                await dispatch({ type: "CLEAR_CART_CLICKED" });
                 setVisible(false);
-                navigation.navigate("cart");
+                NavigateToCart();
               }}
             />
             <Button
@@ -152,9 +175,10 @@ export function CatalogueCartFooter() {
               type="outline"
               title="Generate Link"
               onPress={async () => {
-                await dispatch({ type: "SERVE_FEATURE_REQUEST", payload: "link" });
                 setVisible(false);
-                navigation.navigate("cart");
+                await dispatch({ type: "SERVE_FEATURE_REQUEST", payload: "link" });
+                await dispatch({ type: "CLEAR_CART_CLICKED" });
+                NavigateToCart();
               }}
             />
           </View>

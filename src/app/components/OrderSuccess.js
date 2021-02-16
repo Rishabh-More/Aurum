@@ -28,7 +28,7 @@ export default function OrderSuccess({ success }) {
           title="Download Order Receipt"
           titleStyle={{ color: colors.accent }}
           buttonStyle={{ marginTop: 10, marginBottom: 10 }}
-          onPress={() => Toast.show("Recipt is not available yet. Please Try again Later")}
+          onPress={() => Toast.show("Receipt is not available yet. We're working on it")}
         />
       </View>
     </SafeAreaView>

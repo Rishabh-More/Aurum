@@ -1,7 +1,7 @@
 import React, { useEffect } from "react";
 import { useStore } from "../config/Store";
 import { useDatabase } from "../config/Persistence";
-import { useTheme, useNavigation } from "@react-navigation/native";
+import { useTheme, useNavigation, useNavigationState, useRoute } from "@react-navigation/native";
 import { useDeviceOrientation, useDimensions } from "@react-native-community/hooks";
 import { isTablet, isPhone } from "react-native-device-detection";
 import { responsive } from "./../config/ResponsiveConfig";
@@ -15,10 +15,13 @@ import Toast from "react-native-simple-toast";
 
 export default function Cart() {
   const realm = useDatabase();
+  const route = useRoute();
   const { colors, dark } = useTheme();
   const navigation = useNavigation();
+  const navigationState = useNavigationState((state) => state.routes);
   const orientation = useDeviceOrientation();
   const dimensions = useDimensions();
+  let test;
 
   const phoneColumns = isPhone && orientation.portrait ? 1 : 2;
   const tabColumns = isTablet && orientation.portrait ? 2 : 3;
@@ -29,15 +32,31 @@ export default function Cart() {
     //Screen is focused, ask Confirmation for Checkout Method.
     const screenFocus = navigation.addListener("focus", () => {
       //If No feature has been selected, ask user for feature
-      RequestFeature();
+      console.log("[CART] Cart from Screen Focus", test);
+      if (state.data.cart.length != 0) {
+        //RequestFeature();
+      }
+      //console.log("[CART] Props in route", route);
     });
     //Unsubscribe to listener if component gets unmounted;
     return screenFocus;
   }, [navigation]);
 
   useEffect(() => {
-    console.log("[CART] Cart updated in store", state.data.cart);
+    //RequestFeature();
+    test = state.data.cart;
+    console.log("[CART] Cart updated in store", test);
+    console.log("Last Visited:", state.indicators);
   }, [state.data.cart]);
+
+  useEffect(() => {
+    // Anything in here is fired on component mount.
+    console.log("[CART] Cart updated in mounting");
+    return () => {
+      // Anything in here is fired on component unmount.
+      console.log("[CART] Cart updated unmounting");
+    };
+  }, []);
 
   async function ClearCartItems() {
     try {

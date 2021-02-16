@@ -95,7 +95,14 @@ export function CustomDrawerContent(props) {
             <DrawerItem
               icon={({ size }) => <Icon name="cart-outline" color={colors.accent} size={size} />}
               label={() => <Text style={{ color: colors.text }}>Cart</Text>}
-              onPress={() => props.navigation.navigate("Cart")}
+              onPress={() => {
+                if (state.data.cart.length != 0) {
+                  props.navigation.closeDrawer();
+                  dispatch({ type: "SET_CART_CLICKED", payload: true });
+                } else {
+                  props.navigation.navigate("Cart");
+                }
+              }}
             />
             <DrawerItem
               icon={({ size }) => <Icon name="link-variant" color={colors.accent} size={size} />}
